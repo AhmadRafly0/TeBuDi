@@ -1,4 +1,4 @@
-package com.tebudi.TeBuDi;
+package com.tebudi.TeBuDi.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
