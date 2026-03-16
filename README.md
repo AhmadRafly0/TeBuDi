@@ -25,16 +25,5 @@ Aplikasi ini menggunakan arsitektur *decoupled*, memisahkan antara antarmuka pen
 ## ⚙️ Persyaratan Sistem (Prerequisites)
 Sebelum menjalankan aplikasi, pastikan kamu sudah menginstal:
 * [Node.js](https://nodejs.org/) (versi 18 atau terbaru)
-* [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/downloads/) (versi 17 atau 21)
-* Database MySQL atau PostgreSQL (sesuaikan dengan konfigurasi)
-
----
-
-## 💻 Cara Instalasi & Menjalankan Proyek
-
-Proyek ini terdiri dari dua bagian utama: `backend` dan `frontend`. Keduanya harus dijalankan secara bersamaan di terminal VS Code yang berbeda.
-
-### 1. Setup Backend (Spring Boot)
-Buka terminal dan masuk ke folder backend:
-```bash
-cd backend
+* [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/downloads/) (versi 25)
+* Database MySQL
