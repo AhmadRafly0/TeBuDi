@@ -1,24 +1,17 @@
 package com.tebudi.TeBuDi.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tebudi.TeBuDi.model.User;
-import com.tebudi.TeBuDi.repository.UserRepository;
+import com.tebudi.TeBuDi.dto.UserLoginDTO;
+import com.tebudi.TeBuDi.dto.UserRegisterDTO;
+import com.tebudi.TeBuDi.dto.UserResponseDTO;
 
 @Service
-public class UserService {
+public interface UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
-    }
-
-    public User saveUser(User user){
-        return userRepository.save(user);
-    }
+    UserResponseDTO register(UserRegisterDTO request);
+    UserResponseDTO login(UserLoginDTO request);
+    UserResponseDTO getProfile(String id);
+    UserResponseDTO updateProfile(String id, UserRegisterDTO request);
+    void deleteUser(String id);
 }

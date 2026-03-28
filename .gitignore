@@ -36,3 +36,7 @@ build/
 .env
 .env.local
 .env.*.local
+
+
+postman/*
+.postman/*
