@@ -1,10 +1,13 @@
 package com.tebudi.TeBuDi.service.impl;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.tebudi.TeBuDi.dto.UserLoginDTO;
 import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
+import com.tebudi.TeBuDi.dto.UserUpdateDTO;
 import com.tebudi.TeBuDi.model.User;
 import com.tebudi.TeBuDi.repository.UserRepository;
 import com.tebudi.TeBuDi.service.UserService;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImplement implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -32,7 +36,7 @@ public class UserServiceImplement implements UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User saved = userRepository.save(user);
         return toResponse(saved);
@@ -43,7 +47,7 @@ public class UserServiceImplement implements UserService {
         User user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("Email tidak ditemukan!"));
         
-        if(!request.getPassword().equals(user.getPassword())){
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new RuntimeException("Password salah!");
         }
 
@@ -59,13 +63,13 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateProfile(String id, UserRegisterDTO request){
+    public UserResponseDTO updateProfile(String id, UserUpdateDTO request){
         User user = userRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("User tidak ditemukan!"));
                     
-                    
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        if(StringUtils.hasText(request.getUsername()))  user.setUsername(request.getUsername());
+        if(StringUtils.hasText(request.getEmail()))     user.setEmail(request.getEmail());
+        if(StringUtils.hasText(request.getPassword()))  user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User updated = userRepository.save(user);
 

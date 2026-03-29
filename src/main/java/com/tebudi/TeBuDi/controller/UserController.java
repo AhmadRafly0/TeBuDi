@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
+import com.tebudi.TeBuDi.dto.UserUpdateDTO;
 import com.tebudi.TeBuDi.service.UserService;
 
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateProfile(@PathVariable String id, @Valid @RequestBody UserRegisterDTO request) {
+    public ResponseEntity<UserResponseDTO> updateProfile(@PathVariable String id, @Valid @RequestBody UserUpdateDTO request) {
         return ResponseEntity.ok(userService.updateProfile(id, request));
     }
 
