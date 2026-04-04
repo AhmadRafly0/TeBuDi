@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tebudi.TeBuDi.dto.ApiResponseDTO;
 import com.tebudi.TeBuDi.dto.UserLoginDTO;
 import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.service.UserService;
 
+import io.micrometer.core.ipc.http.HttpSender;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,13 +28,15 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRegisterDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(request));
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegisterDTO request) {
+        UserResponseDTO data = userService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success("Register berhasil!", data));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@Valid @RequestBody UserLoginDTO request) {
-        return ResponseEntity.ok(userService.login(request));
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> login(@Valid @RequestBody UserLoginDTO request) {
+        UserResponseDTO data = userService.login(request);
+        return ResponseEntity.ok(ApiResponseDTO.success("Login berhasil!", data));
     }
     
     
