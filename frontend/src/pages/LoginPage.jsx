@@ -29,13 +29,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <LoginForm 
-        form={form} 
-        loading={loading} 
-        onChange={handleChange} 
-        onSubmit={handleSubmit} 
-      />
-    </div>
-  );
+  <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center">
+    <LoginForm 
+      form={form} 
+      loading={loading} 
+      onChange={handleChange} 
+      onSubmit={handleSubmit} 
+    />
+  </div>
+ );
 }
