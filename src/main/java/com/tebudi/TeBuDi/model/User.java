@@ -70,6 +70,6 @@ public class User {
     )
     private LocalDateTime createdAt;
 
-    // @OneToOne(mappedBy="user")
-    // private UserSubscription userSubs;
+    @OneToOne(mappedBy="user")
+    private UserSubscription userSubs;
 }
