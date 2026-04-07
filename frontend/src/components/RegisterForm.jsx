@@ -1,4 +1,7 @@
-export default function RegisterForm({ form, loading, onChange, onSubmit }) {
+import { Mail, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+
+export default function RegisterForm({ form, loading, onChange, onSubmit, error }) {
   return (
     <div className="w-full max-w-[500px] p-6 bg-[#EFE9E3] rounded-2xl shadow-md space-y-4">
       
@@ -6,7 +9,8 @@ export default function RegisterForm({ form, loading, onChange, onSubmit }) {
         Daftar akun baru
       </div>
 
-      {/* Email */}
+
+
       <input
         type="email"
         name="email"
@@ -15,6 +19,7 @@ export default function RegisterForm({ form, loading, onChange, onSubmit }) {
         onChange={onChange}
         className="w-full px-3 py-2 border rounded-lg"
       />
+      
 
       {/* Password */}
       <input
@@ -35,6 +40,12 @@ export default function RegisterForm({ form, loading, onChange, onSubmit }) {
         onChange={onChange}
         className="w-full px-3 py-2 border rounded-lg"
       />
+
+    {error && (
+      <div className="text-red-500 text-sm text-center">
+        {error}
+      </div>
+    )}
 
       <button
         onClick={onSubmit}
