@@ -1,5 +1,6 @@
 import logo from "../assets/logo.png";
 import { Mail, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function LoginForm({ form, loading, onChange, onSubmit }) {
   return (
@@ -62,6 +63,16 @@ export default function LoginForm({ form, loading, onChange, onSubmit }) {
       >
         {loading ? "Memproses..." : "Masuk →"}
       </button>
+
+      <div className="text-center text-sm">
+        Belum punya akun?{" "}
+        <Link 
+          to="/register" 
+          className="text-[#A3846B] font-medium hover:underline"
+        >
+          Daftar
+        </Link>
+      </div>
 
     </div>
   );
