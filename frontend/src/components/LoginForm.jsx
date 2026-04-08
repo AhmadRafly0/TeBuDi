@@ -2,7 +2,7 @@ import logo from "../assets/logo.png";
 import { Mail, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function LoginForm({ form, loading, onChange, onSubmit }) {
+export default function LoginForm({ form, loading, onChange, onSubmit, error }) {
   return (
     <div className="w-[500px] p-6 bg-[#EFE9E3] rounded-2xl shadow-md space-y-4">
       
@@ -56,6 +56,12 @@ export default function LoginForm({ form, loading, onChange, onSubmit }) {
         </div>
       </div>
 
+      {error && (
+         <div className="text-red-500 text-sm text-center">
+           {error}
+            </div>
+        )}
+          
       <button
         onClick={onSubmit}
         disabled={loading}

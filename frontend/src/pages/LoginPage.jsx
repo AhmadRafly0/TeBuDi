@@ -4,7 +4,26 @@ import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+    const validate = () => {
+    if (!form.email || !form.password) {
+      return "Semua field harus diisi!! >:(";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      return "Email tidak valid!! >:(";
+    }
+
+    if (form.password.length < 8) {
+      return "Password minimal 8 karakter!! >:(";
+    }
+
+    return null;
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -12,6 +31,14 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+     const errMsg = validate();
+      if (errMsg) {
+        setError(errMsg);
+        return;
+      }
+
+    setError("");
     setLoading(true);
 
     try {
@@ -35,6 +62,7 @@ export default function LoginPage() {
       loading={loading} 
       onChange={handleChange} 
       onSubmit={handleSubmit} 
+      error={error}
     />
   </div>
  );
