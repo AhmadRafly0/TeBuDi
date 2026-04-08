@@ -11,6 +11,16 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
 
 
 
+
+      <input
+      type="username"
+      name="username"
+      placeholder="Masukan username!!!!!"
+      value={form.username}
+      onChange={onChange}
+      className="w-full px-3 py-2 border rounded-lg"
+      
+      />
       <input
         type="email"
         name="email"
