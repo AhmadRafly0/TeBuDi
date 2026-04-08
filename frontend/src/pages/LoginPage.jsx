@@ -45,11 +45,11 @@ export default function LoginPage() {
       const response = await axios.post('/api/auth/login', form);
       
       console.log('Login Berhasil:', response.data);
-      alert('Selamat datang di TeBuDi!');
+      alert('Selamat datang di TeBuDi!! :D');
       
     } catch (error) {
       console.error('Login Gagal:', error.response?.data || error.message);
-      alert('Email atau password salah!');
+      alert('Email atau password salah.. :(');
     } finally {
       setLoading(false);
     }

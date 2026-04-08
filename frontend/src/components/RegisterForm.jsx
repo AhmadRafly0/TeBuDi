@@ -28,7 +28,7 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
         <input
           type="username"
           name="username"
-          placeholder="Masukan username!!!!!"
+          placeholder="Username"
           value={form.username}
           onChange={onChange}
           className="w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -47,7 +47,7 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
           id="email"
           type="email"
           name="email"
-          placeholder="Masukan email disini"
+          placeholder="Email"
           value={form.email}
           onChange={onChange}
           className="w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -92,11 +92,11 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
           </div>
       </div>
 
-    {error && (
-      <div className="text-red-500 text-sm text-center">
-        {error}
-      </div>
-    )}
+      {error && (
+        <div className="text-red-500 text-sm text-center">
+          {error}
+        </div>
+      )}
 
       <button
         onClick={onSubmit}
@@ -107,7 +107,7 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
       </button>
     
       <div className="text-center text-sm">
-          Kembali ke {" "}
+          Sudah punya akun? {" "}
           <Link 
             to="/login" 
             className="text-[#A3846B] font-medium hover:underline"
