@@ -4,6 +4,7 @@ import RegisterForm from "../components/RegisterForm.jsx";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -13,7 +14,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
 
   const validate = () => {
-    if (!form.email || !form.password || !form.confirmPassword) {
+    if (!form.username || !form.email || !form.password || !form.confirmPassword) {
       return "Semua field harus diisi!! >:(";
     }
 
@@ -51,9 +52,9 @@ export default function RegisterPage() {
 
     try {
       const response = await axios.post('/api/auth/register', form);
-      alert("Registrasi berhasil!");
+      alert("Registrasi berhasil!! :D");
     } catch (err) {
-      setError("Registrasi gagal!");
+      setError("Registrasi gagal.. :(");
     } finally {
       setLoading(false);
     }
