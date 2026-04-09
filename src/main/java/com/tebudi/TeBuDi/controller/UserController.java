@@ -14,6 +14,9 @@ import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.dto.UserUpdateDTO;
 import com.tebudi.TeBuDi.service.UserService;
 
+import com.tebudi.TeBuDi.dto.UserSubscriptionDTO;
+import com.tebudi.TeBuDi.service.UserSubscriptionService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+    private final UserSubscriptionService userSubscriptionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getProfile(@PathVariable String id) {
@@ -44,6 +48,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponseDTO.success("Data user berhasil dihapus", null));
     }
-    
-    
+
+    @GetMapping("/{id}/usersubscription")
+    public ResponseEntity<ApiResponseDTO<UserSubscriptionDTO>> getUserSubscription(@PathVariable String id) {
+        UserSubscriptionDTO data = userSubscriptionService.getSubscriptionDetails(id);
+        return ResponseEntity.ok(ApiResponseDTO.success("Data langganan berhasil diambil!", data));
+    }
+
 }
