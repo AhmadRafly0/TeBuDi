@@ -1,42 +1,85 @@
+import logo from "../assets/logo.png";
+import { Mail, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
-
-export default function LoginForm({ form, loading, onChange, onSubmit }) {
+export default function LoginForm({ form, loading, onChange, onSubmit, error }) {
   return (
-    <>
-    
-      <div className="form-sub">Login dulu kiddo</div>
+    <div className="w-[500px] p-6 bg-[#EFE9E3] rounded-2xl shadow-md space-y-4">
+      
+      <div className="flex justify-center">
+        <img 
+          src={logo} 
+          alt="Logo" 
+          className="w-100 h-40 object-contain"
+        />
+      </div>
 
-      <div className="field">
-        <label htmlFor="email">Email</label>
-        <div className="input-wrap">
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="nama@email.com"
-            value={form.email}
-            onChange={onChange}
-          />
+      <div className="text-xl font-semibold text-center">
+        Selamat datang!
+      </div>
+
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium mb-1">
+        </label>
+
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={onChange}
+          className="w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="password">Password</label>
-        <div className="input-wrap">
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="Masukkan password"
-            value={form.password}
-            onChange={onChange}
-          />
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium mb-1">
+        </label>
+
+         <div className="relative">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+
+        <input
+          id="password"
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={onChange}
+          className="w-full pl-10 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         </div>
       </div>
 
-      <button className="btn-submit" onClick={onSubmit} disabled={loading}>
-        {loading ? 'Memproses...' : 'Masuk →'}
+      {error && (
+         <div className="text-red-500 text-sm text-center">
+           {error}
+            </div>
+        )}
+          
+      <button
+        onClick={onSubmit}
+        disabled={loading}
+        className="w-full bg-[#A3846B] text-white py-2 rounded-lg hover:bg-[#D9CFC7] transition disabled:opacity-50"
+      >
+        {loading ? "Memproses..." : "Masuk →"}
       </button>
-    </>
-  )
+
+      <div className="text-center text-sm">
+        Belum punya akun?{" "}
+        <Link 
+          to="/register" 
+          className="text-[#A3846B] font-medium hover:underline"
+        >
+          Daftar
+        </Link>
+      </div>
+
+    </div>
+  );
 }
