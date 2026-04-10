@@ -2,7 +2,7 @@ import logo from "../assets/logo.png";
 import { User, Mail, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function RegisterForm({ form, loading, onChange, onSubmit, error }) {
+export default function RegisterForm({ form, loading, onChange, onSubmit}) {
   return (
     <div className="w-full max-w-[500px] p-6 bg-[#EFE9E3] rounded-2xl shadow-md space-y-4">
       
@@ -26,7 +26,7 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
           <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
 
         <input
-          type="username"
+          type="text"
           name="username"
           placeholder="Username"
           value={form.username}
@@ -92,16 +92,16 @@ export default function RegisterForm({ form, loading, onChange, onSubmit, error 
           </div>
       </div>
 
-      {error && (
+      {/* {error && (
         <div className="text-red-500 text-sm text-center">
           {error}
         </div>
-      )}
+      )} */}
 
       <button
         onClick={onSubmit}
         disabled={loading}
-        className="w-full bg-[#A3846B] text-white py-2 rounded-lg"
+        className="w-full bg-[#A3846B] text-white py-2 rounded-lg hover:bg-[#D9CFC7] transition disabled:opacity-50"
       >
         {loading ? "Memproses..." : "Daftar →"}
       </button>

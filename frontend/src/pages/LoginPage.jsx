@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import axios from 'axios';
 import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({ email: '', password: '' });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
     const validate = () => {
     if (!form.email || !form.password) {
@@ -34,24 +37,20 @@ export default function LoginPage() {
 
      const errMsg = validate();
       if (errMsg) {
-        setError(errMsg);
+        toast.error(errMsg)
         return;
       }
 
-    setError("");
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/login', form);
-      
-      console.log('Login Berhasil:', response.data);
-      alert('Selamat datang di TeBuDi!! :D');
-      
+      const response = await axios.post('/api/auth/login', form, { withCredentials: true });
     } catch (error) {
-      console.error('Login Gagal:', error.response?.data || error.message);
-      alert('Email atau password salah.. :(');
+      toast.error('Email atau password salah.. :(')
     } finally {
+      toast.success('Selamat datang di TeBuDi!! :D');
       setLoading(false);
+      navigate('/home');
     }
   };
 
@@ -61,8 +60,7 @@ export default function LoginPage() {
       form={form} 
       loading={loading} 
       onChange={handleChange} 
-      onSubmit={handleSubmit} 
-      error={error}
+      onSubmit={handleSubmit}
     />
   </div>
  );
