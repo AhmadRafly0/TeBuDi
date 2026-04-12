@@ -3,6 +3,7 @@ package com.tebudi.TeBuDi.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,9 +15,10 @@ import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.service.UserService;
 
-import io.micrometer.core.ipc.http.HttpSender;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 
 @RestController
@@ -34,10 +36,34 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> login(@Valid @RequestBody UserLoginDTO request) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> login(@Valid @RequestBody UserLoginDTO request, HttpSession session) {
         UserResponseDTO data = userService.login(request);
+        session.setAttribute("USER_SESSION", data);
         return ResponseEntity.ok(ApiResponseDTO.success("Login berhasil!", data));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getCurrentUser(HttpSession session) {
+        UserResponseDTO sessionUser = (UserResponseDTO) session.getAttribute("USER_SESSION");
+
+        if (sessionUser == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new ApiResponseDTO<>(false, "Session tidak ditemukan, silakan login kembali", null));
+        }
+
+        String id = sessionUser.getId();
+
+        UserResponseDTO data =userService.getProfile(id);
+        return ResponseEntity.ok(ApiResponseDTO.success("Profil ditemukan!", data));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponseDTO<Void>> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok(ApiResponseDTO.success("Logout berhasil!", null));
+    }
+    
+    
     
     
 }

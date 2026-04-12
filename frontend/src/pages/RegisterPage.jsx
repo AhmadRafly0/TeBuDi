@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import axios from 'axios';
 import RegisterForm from "../components/RegisterForm.jsx";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -11,7 +15,6 @@ export default function RegisterPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const validate = () => {
     if (!form.username || !form.email || !form.password || !form.confirmPassword) {
@@ -43,20 +46,21 @@ export default function RegisterPage() {
 
     const errMsg = validate();
     if (errMsg) {
-      setError(errMsg);
+      toast.error(errMsg);
       return;
     }
 
-    setError("");
     setLoading(true);
 
     try {
       const response = await axios.post('/api/auth/register', form);
-      alert("Registrasi berhasil!! :D");
-    } catch (err) {
-      setError("Registrasi gagal.. :(");
+      toast.success("Registrasi berhasil!! :D");
+    } catch (error) {
+      const errorMsg = error.response?.data.message || "Registrasi gagal.. :(";
+      toast.error(errorMsg + "! >:(");
     } finally {
       setLoading(false);
+      navigate('/login');
     }
   };
 
@@ -67,7 +71,6 @@ export default function RegisterPage() {
         loading={loading}
         onChange={handleChange}
         onSubmit={handleSubmit}
-        error={error}
       />
     </div>
   );
