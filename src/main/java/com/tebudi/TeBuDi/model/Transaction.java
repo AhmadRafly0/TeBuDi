@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name="transactions")
@@ -29,7 +28,7 @@ public class Transaction {
         updatable = false, 
         nullable = false
     )
-    private UUID transactionId;
+    private String transactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
