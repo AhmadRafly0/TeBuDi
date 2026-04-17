@@ -45,12 +45,12 @@ export default function LoginPage() {
 
     try {
       const response = await axios.post('/api/auth/login', form, { withCredentials: true });
+      toast.success('Selamat datang di TeBuDi!! :D');
+      navigate('/home');
     } catch (error) {
       toast.error('Email atau password salah.. :(')
     } finally {
-      toast.success('Selamat datang di TeBuDi!! :D');
       setLoading(false);
-      navigate('/home');
     }
   };
 
