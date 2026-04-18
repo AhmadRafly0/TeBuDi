@@ -49,10 +49,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponseDTO.success("Data user berhasil dihapus", null));
     }
 
-    @GetMapping("/{id}/usersubscription")
-    public ResponseEntity<ApiResponseDTO<UserSubscriptionDTO>> getUserSubscription(@PathVariable String id) {
-        UserSubscriptionDTO data = userSubscriptionService.getSubscriptionDetails(id);
-        return ResponseEntity.ok(ApiResponseDTO.success("Data langganan berhasil diambil!", data));
-    }
+
 
 }
