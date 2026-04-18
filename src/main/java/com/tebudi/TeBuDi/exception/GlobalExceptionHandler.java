@@ -18,12 +18,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ApiResponseDTO.error(message));
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponseDTO<?>> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponseDTO.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponseDTO<?>> handleRunTimeException(RuntimeException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponseDTO.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDTO<?>> handleException(Exception ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponseDTO.error(ex.getMessage()));
     }
+
+    
 }

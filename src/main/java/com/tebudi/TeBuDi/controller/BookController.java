@@ -15,8 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tebudi.TeBuDi.dto.ApiResponseDTO; 
+import com.tebudi.TeBuDi.dto.BookRegisterDTO;
+import com.tebudi.TeBuDi.dto.BookResponseDTO;
+import com.tebudi.TeBuDi.dto.BookUpdateDTO;
 import com.tebudi.TeBuDi.model.Book;
 import com.tebudi.TeBuDi.service.BookService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/books")
@@ -32,31 +37,21 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<Book>> getBookById(@PathVariable String id) {
-        return bookService.getBookById(id)
-                .map(book -> ResponseEntity.ok(new ApiResponseDTO<>(true, "Buku ditemukan", book)))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new ApiResponseDTO<>(false, "Buku tidak ditemukan", null)));
+    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> getBookById(@PathVariable String id) {
+        BookResponseDTO data = bookService.getBookById(id);
+        return ResponseEntity.ok(ApiResponseDTO.success("Buku ditemukan!", data));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<Book>> createBook(@RequestBody Book book) {
-        Book savedBook = bookService.saveBook(book);
-        return new ResponseEntity<>(
-            new ApiResponseDTO<>(true, "Buku berhasil ditambahkan!", savedBook), 
-            HttpStatus.CREATED
-        );
+    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> createBook(@Valid @RequestBody BookRegisterDTO request) {
+        BookResponseDTO data = bookService.saveBook(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success("Buku berhasil ditambahkan!", data));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<Book>> updateBook(@PathVariable String id, @RequestBody Book bookDetails) {
-        try {
-            Book updatedBook = bookService.updateBook(id, bookDetails);
-            return ResponseEntity.ok(new ApiResponseDTO<>(true, "Data buku berhasil diperbarui", updatedBook));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponseDTO<>(false, e.getMessage(), null));
-        }
+    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> updateBook(@PathVariable String id,@Valid @RequestBody BookUpdateDTO request) {
+        BookResponseDTO data = bookService.updateBook(id, request);
+        return ResponseEntity.ok(ApiResponseDTO.success("Data buku berhasil diperbarui!", data));
     }
 
     @DeleteMapping("/{id}")

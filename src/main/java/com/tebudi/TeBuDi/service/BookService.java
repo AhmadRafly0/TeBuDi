@@ -1,15 +1,17 @@
 package com.tebudi.TeBuDi.service;
 
 import java.util.List;
-import java.util.Optional;
 
+import com.tebudi.TeBuDi.dto.BookRegisterDTO;
+import com.tebudi.TeBuDi.dto.BookResponseDTO;
+import com.tebudi.TeBuDi.dto.BookUpdateDTO;
 import com.tebudi.TeBuDi.model.Book;
 
 public interface BookService {
     List<Book> getAllBooks();
-    Optional<Book> getBookById(String id);
+    BookResponseDTO getBookById(String id);
     
-    Book saveBook(Book book);
-    Book updateBook(String id, Book book);
+    BookResponseDTO saveBook(BookRegisterDTO book);
+    BookResponseDTO updateBook(String id, BookUpdateDTO book);
     void deleteBook(String id);
 }
