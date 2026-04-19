@@ -15,6 +15,7 @@ import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,8 +59,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponseDTO<Void>> logout(HttpSession session) {
-        session.invalidate();
+    public ResponseEntity<ApiResponseDTO<Void>> logout(HttpServletRequest request) {
+        userService.logout(request);
         return ResponseEntity.ok(ApiResponseDTO.success("Logout berhasil!", null));
     }
     
