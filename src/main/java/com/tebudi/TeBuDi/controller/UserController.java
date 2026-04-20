@@ -40,13 +40,13 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<UserResponseDTO>> updateProfile(@PathVariable String id, @Valid @RequestBody UserUpdateDTO request) {
         UserResponseDTO data = userService.updateProfile(id, request);
-        return ResponseEntity.ok(ApiResponseDTO.success("Data user berhasil diupdate!", data));
+        return ResponseEntity.ok(ApiResponseDTO.success("Data user berhasil diperbarui!", data));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<Void>> deleteUser(@PathVariable String id){
         userService.deleteUser(id);
-        return ResponseEntity.ok(ApiResponseDTO.success("Data user berhasil dihapus", null));
+        return ResponseEntity.ok(ApiResponseDTO.success("Data user berhasil dihapus!", null));
     }
 
 

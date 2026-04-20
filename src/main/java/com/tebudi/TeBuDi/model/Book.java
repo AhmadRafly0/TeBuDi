@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class Book {
     @Id
     @Column(
@@ -32,7 +31,10 @@ public class Book {
     @Column(nullable=false)
     private String title;
 
-    @Column(length=100)
+    @Column(
+        nullable=false,
+        length=100
+    )
     private String author;
 
     @Column(columnDefinition="TEXT")
@@ -52,7 +54,7 @@ public class Book {
         nullable=false,
         columnDefinition="TINYINT(1)"
     )
-    private boolean isPremium;
+    private Boolean isPremium;
 
     
 }

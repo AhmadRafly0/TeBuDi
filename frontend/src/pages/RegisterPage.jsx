@@ -55,12 +55,12 @@ export default function RegisterPage() {
     try {
       const response = await axios.post('/api/auth/register', form);
       toast.success("Registrasi berhasil!! :D");
+      navigate('/login');
     } catch (error) {
       const errorMsg = error.response?.data.message || "Registrasi gagal.. :(";
       toast.error(errorMsg + "! >:(");
     } finally {
       setLoading(false);
-      navigate('/login');
     }
   };
 
