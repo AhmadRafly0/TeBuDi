@@ -1,7 +1,6 @@
 package com.tebudi.TeBuDi.service.impl;
 
 import com.tebudi.TeBuDi.dto.CheckoutResponseDTO;
-import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.dto.PaymentCallbackResponseDTO;
 import com.tebudi.TeBuDi.model.*;
 import com.tebudi.TeBuDi.repository.*;
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     private final TransactionRepository transactionRepository;
-    private final SubscriptionPlansRepository planRepository;
+    private final SubscriptionPlanRepository planRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final UserRepository userRepository; 
 
@@ -31,7 +30,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
         
-        SubscriptionPlans plan = planRepository.findById(planId)
+        SubscriptionPlan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Paket langganan tidak ditemukan"));
 
         Transaction transaction = new Transaction();

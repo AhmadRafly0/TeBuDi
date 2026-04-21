@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubscriptionPlans {
+public class SubscriptionPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "plan_id")
@@ -32,6 +32,6 @@ public class SubscriptionPlans {
     @Column(name = "duration_days", nullable = false)
     private Integer durationDays;
 
-    @Column(name = "has_ads", columnDefinition = "boolean default false")
+    @Column(name = "has_ads")
     private Boolean hasAds = false;
 }

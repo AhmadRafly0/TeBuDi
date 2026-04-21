@@ -42,7 +42,7 @@ public class Transaction {
         name = "plan_id", 
         nullable = false
     )
-    private SubscriptionPlans plan;
+    private SubscriptionPlan plan;
 
     @Column(
         nullable = false, 
