@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class TransactionResponseDTO {
+public class CheckoutResponseDTO {
     private String transactionId;
     private String planName;
     private BigDecimal amount;

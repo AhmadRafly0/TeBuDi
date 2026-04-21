@@ -1,8 +1,9 @@
 package com.tebudi.TeBuDi.service;
 
-import com.tebudi.TeBuDi.model.Transaction;
+import com.tebudi.TeBuDi.dto.CheckoutResponseDTO;
+import com.tebudi.TeBuDi.dto.PaymentCallbackResponseDTO;
 
 public interface SubscriptionService {
-    Transaction createPendingTransaction(String userId, Integer planId);
-    void processSuccessfulPayment(String transactionId);
+    CheckoutResponseDTO createPendingTransaction(String userId, Integer planId);
+    PaymentCallbackResponseDTO processSuccessfulPayment(String transactionId);
 }
