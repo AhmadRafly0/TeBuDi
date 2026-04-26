@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const colors = {
   white: "#FFFFFF",
@@ -10,48 +12,25 @@ const colors = {
   danger: "#e53e3e"
 };
 
-const mockPlans = [
-  {
-    planId: 1,
-    planName: "Basic",
-    price: 25000,
-    formattedPrice: "Rp 25.000",
-    durationDays: 30,
-    hasAds: true
-  },
-  {
-    planId: 2,
-    planName: "Premium",
-    price: 50000,
-    formattedPrice: "Rp 50.000",
-    durationDays: 30,
-    hasAds: false
-  },
-  {
-    planId: 3,
-    planName: "Family",
-    price: 120000,
-    formattedPrice: "Rp 120.000",
-    durationDays: 90,
-    hasAds: false
-  }
-];
-
 const CheckIcon = () => (
-  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke={colors.brown} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke={colors.brown} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
   </svg>
 );
 
 const XIcon = () => (
-  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke={colors.danger} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path>
+  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke={colors.danger} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" />
   </svg>
 );
 
-const SubscriptionCard = ({ plan, onSelect }) => {
+const formatPrice = (price) => `Rp ${price.toLocaleString('id-ID')}`;
+
+const SubscriptionCard = ({ plan, onSelect, loadingPlanId }) => {
+  const isLoading = loadingPlanId === plan.planId;
+
   return (
-    <div 
+    <div
       className="relative overflow-hidden rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full bg-white"
       style={{ border: `1px solid ${colors.beige}` }}
     >
@@ -69,7 +48,7 @@ const SubscriptionCard = ({ plan, onSelect }) => {
         </h2>
         <div className="flex items-baseline justify-center mt-4">
           <span className="text-4xl font-black" style={{ color: colors.textDark }}>
-            {plan.formattedPrice}
+            {formatPrice(plan.price)}
           </span>
           <span className="ml-1 text-gray-400 text-sm">/{plan.durationDays} hari</span>
         </div>
@@ -95,12 +74,21 @@ const SubscriptionCard = ({ plan, onSelect }) => {
       </div>
 
       <div className="p-8 pt-0">
-        <button 
-          className="w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all active:scale-95 hover:opacity-90"
+        <button
+          className="w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all active:scale-95 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           style={{ backgroundColor: colors.brown }}
           onClick={() => onSelect(plan)}
+          disabled={!!loadingPlanId}
         >
-          Pilih Paket
+          {isLoading ? (
+            <>
+              <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              Memproses...
+            </>
+          ) : 'Pilih Paket'}
         </button>
       </div>
     </div>
@@ -108,22 +96,64 @@ const SubscriptionCard = ({ plan, onSelect }) => {
 };
 
 const SubscriptionPage = () => {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [loadingPlanId, setLoadingPlanId] = useState(null);
+  const [checkoutError, setCheckoutError] = useState(null);
 
   useEffect(() => {
-    // Simulasi loading sebentar
-    const timer = setTimeout(() => {
-      setPlans(mockPlans); // Gunakan data bohongan
-      setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+    const fetchPlans = async () => {
+      try {
+        const { data: json } = await axios.get('/api/plans');
+        if (!json.success) throw new Error(json.message || 'Gagal mengambil data plan.');
+        setPlans(json.data);
+      } catch (err) {
+        setError(err.response?.data?.message || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
   }, []);
+
+  const handleSelectPlan = async (plan) => {
+    setLoadingPlanId(plan.planId);
+    setCheckoutError(null);
+
+    try {
+      const { data: json } = await axios.post('/api/subscriptions/checkout', {
+        planId: plan.planId
+      });
+
+      if (!json.success) throw new Error(json.message || 'Checkout gagal.');
+
+      navigate('/payment', { state: { transaction: json.data } });
+
+    } catch (err) {
+      setCheckoutError(err.response?.data?.message || err.message);
+    } finally {
+      setLoadingPlanId(null);
+    }
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.lightBeige }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-4" style={{ borderColor: colors.brown }}></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4" style={{ borderColor: colors.brown }} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.lightBeige }}>
+        <div className="text-center">
+          <p className="text-lg font-semibold mb-2" style={{ color: colors.danger }}>Gagal memuat data</p>
+          <p className="text-sm text-gray-500">{error}</p>
+        </div>
       </div>
     );
   }
@@ -137,12 +167,19 @@ const SubscriptionPage = () => {
           </h1>
         </header>
 
+        {checkoutError && (
+          <div className="mb-8 p-4 rounded-2xl text-center text-sm font-medium bg-red-50 border border-red-200" style={{ color: colors.danger }}>
+            {checkoutError}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {plans.map((item) => (
-            <SubscriptionCard 
-              key={item.planId} 
-              plan={item} 
-              onSelect={(p) => alert(`Memilih paket: ${p.planName}`)} 
+            <SubscriptionCard
+              key={item.planId}
+              plan={item}
+              onSelect={handleSelectPlan}
+              loadingPlanId={loadingPlanId}
             />
           ))}
         </div>

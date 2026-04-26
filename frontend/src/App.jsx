@@ -5,6 +5,8 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionAdminPage from './pages/SubscriptionAdminPage';
+import PaymentPage from './pages/PaymentPage';
+import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   return (
@@ -48,6 +50,8 @@ export default function App() {
       <Route path="/home" element={<HomePage/>}/>
       <Route path="/subscription" element={<SubscriptionPage/>}/>
       <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
+      <Route path='/payment' element={<PaymentPage/>} />
+      <Route path="/profile" element={<ProfilePage/>}/>
 
       <Route path="*" element={
         <div style={{ textAlign: 'center', padding: '4rem', color: '#000000' }}>
