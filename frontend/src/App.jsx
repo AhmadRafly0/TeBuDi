@@ -3,6 +3,8 @@ import { Toaster } from 'react-hot-toast';
 import LoginPage    from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import FavouritePage from "./pages/FavouritePage";
+import CategoryPage from './pages/CategoryPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionAdminPage from './pages/SubscriptionAdminPage';
 import PaymentPage from './pages/PaymentPage';
@@ -48,6 +50,8 @@ export default function App() {
       <Route path="/login"     element={<LoginPage />} />
       <Route path="/register"  element={<RegisterPage />} />
       <Route path="/home" element={<HomePage/>}/>
+      <Route path="/favourite" element={<FavouritePage/>} />
+      <Route path="/category" element={<CategoryPage/>} />
       <Route path="/subscription" element={<SubscriptionPage/>}/>
       <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
       <Route path='/payment' element={<PaymentPage/>} />
