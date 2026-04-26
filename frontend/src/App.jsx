@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import LoginPage    from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionAdminPage from './pages/SubscriptionAdminPage';
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/login"     element={<LoginPage />} />
       <Route path="/register"  element={<RegisterPage />} />
       <Route path="/home" element={<HomePage/>}/>
+      <Route path="/subscription" element={<SubscriptionPage/>}/>
       <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
 
       <Route path="*" element={
