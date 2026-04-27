@@ -7,10 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,13 +43,15 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> createBook(@Valid @RequestBody BookRegisterDTO request) {
+    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> createBook(@Valid @ModelAttribute BookRegisterDTO request) {
         BookResponseDTO data = bookService.saveBook(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success("Buku berhasil ditambahkan!", data));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> updateBook(@PathVariable String id,@Valid @RequestBody BookUpdateDTO request) {
+    public ResponseEntity<ApiResponseDTO<BookResponseDTO>> updateBook(
+            @PathVariable String id,
+            @Valid @ModelAttribute BookUpdateDTO request) {  // ✅ @ModelAttribute untuk multipart
         BookResponseDTO data = bookService.updateBook(id, request);
         return ResponseEntity.ok(ApiResponseDTO.success("Data buku berhasil diperbarui!", data));
     }
