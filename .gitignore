@@ -40,3 +40,6 @@ build/
 
 postman/*
 .postman/*
+
+data-storage/books/*
+!data-storage/books/.gitkeep

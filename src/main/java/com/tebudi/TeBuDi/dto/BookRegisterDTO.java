@@ -1,5 +1,7 @@
 package com.tebudi.TeBuDi.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,12 +10,15 @@ import lombok.Data;
 @Data
 public class BookRegisterDTO {
 
+    @NotNull(message = "File buku wajib diunggah")
+    private MultipartFile bookFile;
+
     @NotBlank(message = "ID Book tidak boleh kosong")
     @Size(min = 1, max = 50, message = "ID Book harus antara 1 - 50 karakter")
     private String id;
 
     @NotNull(message = "Kategori tidak boleh kosong")
-    private int category;
+    private Integer category;
 
     @NotBlank(message = "Judul tidak boleh kosong")
     private String title;
@@ -26,7 +31,6 @@ public class BookRegisterDTO {
 
     private String coverURL;
 
-    @NotBlank(message = "URL File tidak boleh kosong")
     private String fileURL;
 
     @NotNull(message = "Is Premium tidak boleh kosong")

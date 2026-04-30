@@ -1,10 +1,14 @@
 package com.tebudi.TeBuDi.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class BookUpdateDTO {
+
+    private MultipartFile bookFile; 
 
     private Integer category;
 
@@ -17,8 +21,6 @@ public class BookUpdateDTO {
     private String description;
 
     private String coverURL;
-
-    private String fileURL;
 
     private Boolean isPremium;
 }
