@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import com.tebudi.TeBuDi.exception.UnauthorizedException;
+import com.tebudi.TeBuDi.service.UserSubscriptionService;
+
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
@@ -22,11 +27,13 @@ import com.tebudi.TeBuDi.model.Book;
 import com.tebudi.TeBuDi.repository.BookRepository;
 import com.tebudi.TeBuDi.service.BookService;
 
-
 @Service
 public class BookServiceImpl implements BookService{
     @Autowired 
     private BookRepository bookRepository;
+
+    @Autowired
+    private UserSubscriptionService userSubscriptionService;
 
     @Override
     public List<Book> getAllBooks(){
@@ -160,5 +167,27 @@ public class BookServiceImpl implements BookService{
                 .fileURL(book.getFileURL())
                 .isPremium(book.getIsPremium())
                 .build();
+    }
+
+    @Override
+    public Resource getBookFileAsResource(String bookId, String userId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan!"));
+        if (Boolean.TRUE.equals(book.getIsPremium())) {
+            if (userId == null || !userSubscriptionService.isUserSubscribed(userId)) {
+                throw new UnauthorizedException("Akses ditolak! Kamu harus berlangganan paket premium untuk membaca buku ini.");
+            }
+        }
+        try {
+            Path filePath = Paths.get(System.getProperty("user.dir"), "data-storage", book.getFileURL()).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("File dokumen buku tidak ditemukan di server.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Gagal membaca file buku: " + e.getMessage(), e);
+        }
     }
 }
