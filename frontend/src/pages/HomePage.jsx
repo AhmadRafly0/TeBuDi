@@ -95,19 +95,19 @@ export default function HomePage() {
               >
                 <div className="relative aspect-[3/4] mb-4 overflow-hidden rounded-2xl shadow-md transition-transform duration-300 group-hover:-translate-y-2">
                   <img 
-                    src={book.coverURL}
+                    src={book.coverURL || "https://bookstoreromanceday.org/wp-content/uploads/2020/08/book-cover-placeholder.png"} 
                     alt={book.title}
                     className="w-full h-full object-cover"
                     onError={(e) => (e.currentTarget.style.display = "none")}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                  <div className="absolute inset-0 bg-opacity-0 hover:bg-black/50 transition-all flex items-center justify-center">
                     <BookOpen className="text-white opacity-0 group-hover:opacity-100 transition-opacity" size={32} />
                   </div>
                 </div>
                 <h3 className="font-bold text-lg leading-tight mb-1 truncate" style={{ color: colors.textDark }}>
                   {book.title}
                 </h3>
-                <p className="text-sm text-gray-500 mb-2">{book.coverURL}</p>
+                <p className="text-sm text-gray-500 mb-2">{book.author}</p>
                 <div className="flex items-center gap-1 text-yellow-500">
                   <Star size={14} fill="currentColor" />
                   <span className="text-xs font-bold text-gray-600">4.8</span>
@@ -124,6 +124,8 @@ export default function HomePage() {
           </div>
         )}
       </div>
+
+    
     </DashboardLayout>
   );
 }
