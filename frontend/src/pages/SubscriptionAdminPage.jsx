@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X, AlertCircle } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import axios from 'axios';
 import Table from '../components/Table'; 
 
-// modal form tambah/edit paket
 const PlanFormModal = ({ isOpen, onClose, onSubmit, initialData, loading }) => {
   const [formData, setFormData] = useState({ planName: '', price: '', durationDays: '', hasAds: false });
 
@@ -122,7 +121,7 @@ const PlanFormModal = ({ isOpen, onClose, onSubmit, initialData, loading }) => {
   );
 };
 
-// modal konfirmasi hapus
+
 const ConfirmModal = ({ isOpen, onClose, onConfirm, planName, loading }) => {
   if (!isOpen) return null;
 
@@ -159,7 +158,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, planName, loading }) => {
   );
 };
 
-// halaman utama admin mengelola langganan
+
 export default function SubscriptionAdminPage() {
   const [plans, setPlans] = useState([]);
   
@@ -225,7 +224,6 @@ export default function SubscriptionAdminPage() {
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] font-sans">
-      <Toaster position="bottom-right" />
       
       <div className="max-w-6xl mx-auto p-6 md:p-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
