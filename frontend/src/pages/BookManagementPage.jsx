@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom"; //test link - faziz
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -76,14 +77,14 @@ function BookCard({ book, onEdit, onDelete }) {
         </h3>
         <p className="text-xs text-stone-500 mt-0.5 truncate">{book.author}</p>
         {book.fileURL && (
-          <a
-            href={`${BASE_URL}/files/${book.fileURL}`}
+          <Link
+            to={`/read/${book.id}`}
             target="_blank"
-            rel="noreferrer"
+            rel="noreferrer" 
             className="mt-1.5 text-[10px] text-sky-600 hover:underline truncate"
           >
-            Lihat PDF ↗
-          </a>
+            Mulai Membaca
+          </Link>
         )}
       </div>
 
