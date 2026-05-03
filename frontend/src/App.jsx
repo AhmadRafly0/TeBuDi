@@ -3,8 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import LoginPage    from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
-import ManagementBookPage from './pages/BookManagementPage';
-import ReadBookPage from './pages/ReadBookPage';
+
 
 import FavouritePage from "./pages/FavouritePage";
 import CategoryPage from './pages/CategoryPage';
@@ -14,7 +13,6 @@ import ReadBookPage from './pages/ReadBookPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionAdminPage from './pages/SubscriptionAdminPage';
 import PaymentPage from './pages/PaymentPage';
-import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   return (

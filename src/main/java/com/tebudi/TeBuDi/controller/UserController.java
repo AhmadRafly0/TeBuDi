@@ -14,9 +14,6 @@ import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.dto.UserUpdateDTO;
 import com.tebudi.TeBuDi.service.UserService;
 
-import com.tebudi.TeBuDi.dto.UserSubscriptionDTO;
-import com.tebudi.TeBuDi.service.UserSubscriptionService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
-    private final UserSubscriptionService userSubscriptionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getProfile(@PathVariable String id) {

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from "../components/DashbordLayout";
 import { Search, BookOpen, Star } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const colors = {
   lightBeige: "#F5F1ED",
@@ -12,11 +13,21 @@ const colors = {
   teal: "#1a7a8a",
 };
 
+const CATEGORIES = [
+  { value: 1, label: "Fiksi" },
+  { value: 2, label: "Non-Fiksi" },
+  { value: 3, label: "Sains" },
+  { value: 4, label: "Teknologi" },
+  { value: 5, label: "Sejarah" },
+];
+
 export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
+  const [selectedBook, setSelectedBook] = useState(null);
 
   // Fetch data buku dari API Backend kamu
   useEffect(() => {
@@ -41,6 +52,32 @@ export default function HomePage() {
     book.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Fungsi untuk menangani klik tombol BACA
+  const handleReadClick = async (book) => {
+    if (!book.isPremium) {
+      navigate(`/read/${book.id}`);
+      return;
+    }
+
+    // Jika buku PREMIUM, cek status langganan User
+    try {
+      const response = await axios.get('/api/userSubs/status');
+      
+      if (response.data.success) {
+        const isSubscribed = response.data.data.active;
+        
+        if (isSubscribed) {
+          navigate(`/read/${book.id}`);
+        } else {
+          toast.error("Buku ini khusus pengguna Premium. Silakan berlangganan terlebih dahulu.", { id: 'premium-toast' });
+          navigate('/subscription');
+        }
+      }
+    } catch (error) {
+      toast.error("Gagal memeriksa status langganan. Pastikan kamu sudah login.", { id: 'status-error' });
+    }
+  };
+  
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
