@@ -49,7 +49,8 @@ export default function App() {
       <Route path="/home" element={<HomePage/>}/>
       <Route path="/favourite" element={<FavouritePage/>} />
       <Route path="/category" element={<CategoryPage/>} />
-      <Route path="/atminbook" element={<ManagementBookPage/>} />
+      <Route path="/admin/books" element={<ManagementBookPage/>} />
+      <Route path="/read/:id" element={<ReadBookPage/>} />
 
       <Route path="*" element={
         <div style={{ textAlign: 'center', padding: '4rem', color: '#000000' }}>
