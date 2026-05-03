@@ -8,6 +8,9 @@ import ReadBookPage from './pages/ReadBookPage';
 
 import FavouritePage from "./pages/FavouritePage";
 import CategoryPage from './pages/CategoryPage';
+import ProfilePage from './pages/ProfilePage';
+import ManagementBookPage from './pages/BookManagementPage';
+import ReadBookPage from './pages/ReadBookPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SubscriptionAdminPage from './pages/SubscriptionAdminPage';
 import PaymentPage from './pages/PaymentPage';
@@ -53,14 +56,14 @@ export default function App() {
       <Route path="/login"     element={<LoginPage />} />
       <Route path="/register"  element={<RegisterPage />} />
       <Route path="/home" element={<HomePage/>}/>
-      <Route path="/admin/books" element={<ManagementBookPage />} />
-      <Route path="/read/:id" element={<ReadBookPage />} />
       <Route path="/favourite" element={<FavouritePage/>} />
       <Route path="/category" element={<CategoryPage/>} />
-      <Route path="/subscription" element={<SubscriptionPage/>}/>
+      <Route path="/profile" element={<ProfilePage/>} />
+      <Route path="/admin/books" element={<ManagementBookPage />} />
       <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
+      <Route path="/subscription" element={<SubscriptionPage/>}/>
       <Route path='/payment' element={<PaymentPage/>} />
-      <Route path="/profile" element={<ProfilePage/>}/>
+      <Route path="/read/:id" element={<ReadBookPage />} />
 
       <Route path="*" element={
         <div style={{ textAlign: 'center', padding: '4rem', color: '#000000' }}>
