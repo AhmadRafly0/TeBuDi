@@ -12,6 +12,7 @@ const colors = {
   teal: "#1a7a8a",
 };
 
+
 export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -129,3 +130,4 @@ export default function HomePage() {
     </DashboardLayout>
   );
 }
+

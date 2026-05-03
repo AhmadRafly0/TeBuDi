@@ -12,7 +12,6 @@ const colors = {
 };
 
 const formatPrice = (amount) => `Rp ${Number(amount).toLocaleString('id-ID')}`;
-
 const PaymentPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();

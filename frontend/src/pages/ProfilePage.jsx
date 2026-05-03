@@ -18,7 +18,6 @@ const ProfilePage = () => {
   const isUpdating = useRef(false);
   const isDeleting = useRef(false);
   const fileInputRef = useRef(null); // Ref untuk input file
-
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [updateLoading, setUpdateLoading] = useState(false);
