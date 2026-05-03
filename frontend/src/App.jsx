@@ -8,7 +8,9 @@ import CategoryPage from './pages/CategoryPage';
 import ProfilePage from './pages/ProfilePage';
 import ManagementBookPage from './pages/BookManagementPage';
 import ReadBookPage from './pages/ReadBookPage';
-
+import SubscriptionPage from './pages/SubscriptionPage';
+import SubscriptionAdminPage from './pages/SubscriptionAdminPage';
+import PaymentPage from './pages/PaymentPage';
 
 export default function App() {
   return (
@@ -54,6 +56,9 @@ export default function App() {
       <Route path="/category" element={<CategoryPage/>} />
       <Route path="/profile" element={<ProfilePage/>} />
       <Route path="/admin/books" element={<ManagementBookPage />} />
+      <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
+      <Route path="/subscription" element={<SubscriptionPage/>}/>
+      <Route path='/payment' element={<PaymentPage/>} />
       <Route path="/read/:id" element={<ReadBookPage />} />
 
       <Route path="*" element={
