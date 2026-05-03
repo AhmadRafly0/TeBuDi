@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage';
 import FavouritePage from "./pages/FavouritePage";
 import CategoryPage from './pages/CategoryPage';
 import ManagementBookPage from './pages/BookManagementPage';
+import ReadBookPage from './pages/ReadBookPage';
+
 
 export default function App() {
   return (
@@ -49,8 +51,8 @@ export default function App() {
       <Route path="/home" element={<HomePage/>}/>
       <Route path="/favourite" element={<FavouritePage/>} />
       <Route path="/category" element={<CategoryPage/>} />
-      <Route path="/admin/books" element={<ManagementBookPage/>} />
-      <Route path="/read/:id" element={<ReadBookPage/>} />
+      <Route path="/admin/books" element={<ManagementBookPage />} />
+      <Route path="/read/:id" element={<ReadBookPage />} />
 
       <Route path="*" element={
         <div style={{ textAlign: 'center', padding: '4rem', color: '#000000' }}>
