@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// 1. Tambahkan Link di sini
+import { useNavigate, Link } from "react-router-dom";
 
 const DEFAULT_AVATAR = "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg";
 
@@ -41,18 +42,23 @@ export default function Header() {
 
       <div className="flex items-center gap-6">
         <div className="h-8 w-px bg-stone-200" />
-        <div className="flex items-center gap-3 cursor-pointer group p-1 rounded-full hover:bg-stone-50 transition-all">
+        
+        {/* 2. Ubah div menjadi Link dan arahkan ke /profile */}
+        <Link 
+          to="/profile" 
+          className="flex items-center gap-3 cursor-pointer group p-1 rounded-full hover:bg-stone-50 transition-all no-underline"
+        >
           <img
             src={user?.avatarURL || DEFAULT_AVATAR}
             alt={user?.username ?? "User"}
-            className="h-10 w-10 rounded-full object-cover border-2 border-[#EFE9E2] shadow-sm"
+            className="h-10 w-10 rounded-full object-cover border-2 border-[#EFE9E2] shadow-sm group-hover:border-[#A3846B] transition-colors"
           />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-[#5D4037]">
+            <span className="text-sm font-semibold text-[#5D4037] group-hover:text-[#A3846B] transition-colors">
               {user?.username ?? "..."}
             </span>
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   );

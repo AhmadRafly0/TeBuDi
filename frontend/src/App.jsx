@@ -5,6 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import FavouritePage from "./pages/FavouritePage";
 import CategoryPage from './pages/CategoryPage';
+import ProfilePage from './pages/ProfilePage';
 import ManagementBookPage from './pages/BookManagementPage';
 import ReadBookPage from './pages/ReadBookPage';
 
@@ -51,6 +52,7 @@ export default function App() {
       <Route path="/home" element={<HomePage/>}/>
       <Route path="/favourite" element={<FavouritePage/>} />
       <Route path="/category" element={<CategoryPage/>} />
+      <Route path="/profile" element={<ProfilePage/>} />
       <Route path="/admin/books" element={<ManagementBookPage />} />
       <Route path="/read/:id" element={<ReadBookPage />} />
 

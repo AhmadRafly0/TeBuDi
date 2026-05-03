@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { ArrowLeft, Camera, Loader2 } from 'lucide-react'; // Tambahkan lucide-react untuk ikon
 
 const colors = {
   lightBeige: "#F5F1ED",
@@ -16,11 +17,13 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const isUpdating = useRef(false);
   const isDeleting = useRef(false);
+  const fileInputRef = useRef(null); // Ref untuk input file
 
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [updateLoading, setUpdateLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false); // Loading khusus upload
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -41,6 +44,38 @@ const ProfilePage = () => {
     };
     fetchProfile();
   }, [navigate]);
+
+  // Fungsi untuk menangani perubahan foto profil
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validasi ukuran (contoh: max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Ukuran file terlalu besar (Maks 2MB)");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setUploadLoading(true);
+    try {
+      // Sesuaikan endpoint ini dengan backend kamu (misal: /api/users/{id}/avatar)
+      const response = await axios.post(`/api/users/${user.id}/avatar`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (response.data.success) {
+        setUser(prev => ({ ...prev, avatarURL: response.data.data.avatarURL }));
+        toast.success("Foto profil berhasil diperbarui!");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Gagal mengunggah foto.");
+    } finally {
+      setUploadLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -102,32 +137,65 @@ const ProfilePage = () => {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.lightBeige }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-4" style={{ borderColor: colors.teal }} />
+        <Loader2 className="animate-spin h-12 w-12" style={{ color: colors.teal }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-16 px-4" style={{ backgroundColor: colors.lightBeige }}>
+    <div className="min-h-screen py-12 px-4" style={{ backgroundColor: colors.lightBeige }}>
       <div className="max-w-lg mx-auto space-y-6">
+        
+        {/* Tombol Kembali */}
+        <button 
+          onClick={() => navigate('/home')}
+          className="flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3"
+          style={{ color: colors.textDark }}
+        >
+          <ArrowLeft size={18} /> Kembali ke Beranda
+        </button>
 
         {/* Profile Card */}
         <div className="bg-white rounded-3xl shadow-xl p-8" style={{ border: `1px solid ${colors.beige}` }}>
           <div className="flex items-center gap-5 pb-6 mb-6" style={{ borderBottom: `1px solid ${colors.beige}` }}>
-            {user.avatarURL ? (
-              <img
-                src={user.avatarURL}
-                alt={user.username}
-                className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+            
+            {/* Foto Profil dengan Fungsi Ganti */}
+            <div className="relative group">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                className="hidden" 
+                accept="image/*"
               />
-            ) : (
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
-                style={{ backgroundColor: colors.teal }}
-              >
-                {getInitials(user.username)}
+              
+              <div className="relative overflow-hidden rounded-full w-20 h-20 shadow-md border-2 border-white">
+                {user.avatarURL ? (
+                  <img
+                    src={user.avatarURL}
+                    alt={user.username}
+                    className={`w-full h-full object-cover transition-opacity ${uploadLoading ? 'opacity-50' : 'opacity-100'}`}
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center text-xl font-bold text-white"
+                    style={{ backgroundColor: colors.teal }}
+                  >
+                    {getInitials(user.username)}
+                  </div>
+                )}
+
+                {/* Overlay Hover untuk Upload */}
+                <button 
+                  onClick={() => fileInputRef.current.click()}
+                  disabled={uploadLoading}
+                  className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  {uploadLoading ? <Loader2 className="animate-spin text-white" size={20} /> : <Camera className="text-white" size={20} />}
+                </button>
               </div>
-            )}
+            </div>
+
             <div>
               <p className="text-lg font-bold" style={{ color: colors.textDark }}>{user.username}</p>
               <p className="text-sm" style={{ color: colors.brown }}>{user.email}</p>
@@ -175,17 +243,12 @@ const ProfilePage = () => {
             style={{ backgroundColor: colors.teal }}
           >
             {updateLoading ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                </svg>
-                Menyimpan...
-              </>
+              <Loader2 className="animate-spin h-5 w-5" />
             ) : 'Simpan Perubahan'}
           </button>
         </div>
 
+        {/* Danger Zone */}
         <div className="bg-white rounded-3xl shadow-xl p-8" style={{ border: `1px solid #fecaca` }}>
           <h2 className="text-sm font-bold uppercase tracking-widest mb-1" style={{ color: colors.danger }}>
             Danger Zone
@@ -222,15 +285,7 @@ const ProfilePage = () => {
                   className="flex-1 py-3 rounded-2xl font-bold text-sm text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{ backgroundColor: colors.danger }}
                 >
-                  {deleteLoading ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                      </svg>
-                      Menghapus...
-                    </>
-                  ) : 'Ya, Hapus'}
+                  {deleteLoading ? <Loader2 className="animate-spin h-4 w-4" /> : 'Ya, Hapus'}
                 </button>
               </div>
             </div>
