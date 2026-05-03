@@ -46,11 +46,11 @@ export default function Sidebar() {
 
         <nav className="space-y-2 pb-20">
           <SidebarItem icon={<Home size={20} />} text="Home" to="/home" active={location.pathname === "/home"} />
-          <SidebarItem icon={<LayoutGrid size={20} />} text="Category" to="#" active={location.pathname === "/category"}/>
+          <SidebarItem icon={<LayoutGrid size={20} />} text="Category" to="/category" active={location.pathname === "/category"}/>
           <SidebarItem icon={<Library size={20} />} text="My Library" to="#" active={location.pathname === "/library"}/>          
-          <SidebarItem icon={<Heart size={20} />} text="Favourite" to="#" active={location.pathname === "/favourite"} />
+          <SidebarItem icon={<Heart size={20} />} text="Favourite" to="/favourite" active={location.pathname === "/favourite"} />
         </nav>
-        <div className="pt-20 space-y-2 border-t border-stone-200/60">
+        <div className="pt-0 space-y-2 border-t border-stone-200/60">
           <SidebarItem icon={<Settings size={20} />} text="Settings" to="#" active={location.pathname === "/settings"}/>
           <SidebarItem icon={<HelpCircle size={20} />} text="Support" to="#" active={location.pathname === "/support"}/>
           <SidebarItem icon={<LogOut size={20} />} text="Logout" onClick={handleLogout} />

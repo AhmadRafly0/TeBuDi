@@ -52,9 +52,9 @@ public class AuthController {
             .body(new ApiResponseDTO<>(false, "Session tidak ditemukan, silakan login kembali", null));
         }
 
-        String id = sessionUser.getId();
+        String userId = sessionUser.getId();
 
-        UserResponseDTO data =userService.getProfile(id);
+        UserResponseDTO data =userService.getProfile(userId);
         return ResponseEntity.ok(ApiResponseDTO.success("Profil ditemukan!", data));
     }
 
