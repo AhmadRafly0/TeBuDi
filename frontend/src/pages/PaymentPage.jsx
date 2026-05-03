@@ -12,13 +12,13 @@ const colors = {
 };
 
 const formatPrice = (amount) => `Rp ${Number(amount).toLocaleString('id-ID')}`;
-
 const PaymentPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const transaction = state?.transaction;
 
   const [loading, setLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
@@ -47,6 +47,23 @@ const PaymentPage = () => {
     }
   };
 
+  const handleCancelPayment = async () => {
+    setCancelLoading(true);
+    setError(null);
+
+    try {
+      await axios.post('/api/subscriptions/cancel', {
+        transactionId: transaction.transactionId
+      });
+      
+      navigate('/subscription');
+
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Gagal membatalkan pembayaran.');
+      setCancelLoading(false);
+    }
+  };
+
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: colors.lightBeige }}>
@@ -71,6 +88,8 @@ const PaymentPage = () => {
       </div>
     );
   }
+
+  const isProcessing = loading || cancelLoading;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: colors.lightBeige }}>
@@ -120,7 +139,7 @@ const PaymentPage = () => {
             className="w-full py-4 rounded-2xl font-bold text-white shadow-lg hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{ backgroundColor: colors.brown }}
             onClick={handleConfirmPayment}
-            disabled={loading}
+            disabled={isProcessing}
           >
             {loading ? (
               <>
@@ -134,12 +153,12 @@ const PaymentPage = () => {
           </button>
 
           <button
-            className="w-full py-3 rounded-2xl font-semibold text-sm transition-all hover:opacity-70"
+            className="w-full py-3 rounded-2xl font-semibold text-sm transition-all hover:opacity-70 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             style={{ color: colors.brown }}
-            onClick={() => navigate('/subscription')}
-            disabled={loading}
+            onClick={handleCancelPayment}
+            disabled={isProcessing}
           >
-            Batalkan & Kembali
+            {cancelLoading ? 'Membatalkan...' : 'Batalkan & Kembali'}
           </button>
         </div>
       </div>

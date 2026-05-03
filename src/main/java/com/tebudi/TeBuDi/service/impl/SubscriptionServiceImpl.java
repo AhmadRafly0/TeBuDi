@@ -70,6 +70,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return toSubscriptionResponse(saved);
     }
 
+    @Override
+    @Transactional
+    public CheckoutResponseDTO cancelTransaction(String transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+
+        if (transaction.getStatus() != Transaction.TransactionStatus.PENDING) {
+            throw new RuntimeException("Gagal dibatalkan: Transaksi sudah " + transaction.getStatus());
+        }
+
+        transaction.setStatus(Transaction.TransactionStatus.FAILED);
+
+        Transaction saved =  transactionRepository.save(transaction);
+        return toResponse(saved);
+    }
+
     private CheckoutResponseDTO toResponse(Transaction transaction) {
     return CheckoutResponseDTO.builder()
             .transactionId(transaction.getTransactionId())
