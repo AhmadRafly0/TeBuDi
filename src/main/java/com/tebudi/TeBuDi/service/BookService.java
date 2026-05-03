@@ -6,6 +6,7 @@ import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
 import com.tebudi.TeBuDi.model.Book;
+import org.springframework.core.io.Resource;
 
 public interface BookService {
     List<Book> getAllBooks();
@@ -14,4 +15,6 @@ public interface BookService {
     BookResponseDTO saveBook(BookRegisterDTO book);
     BookResponseDTO updateBook(String id, BookUpdateDTO book);
     void deleteBook(String id);
+
+    Resource getBookFileAsResource(String bookId, String userId);
 }

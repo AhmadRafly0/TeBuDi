@@ -21,6 +21,13 @@ import com.tebudi.TeBuDi.dto.BookUpdateDTO;
 import com.tebudi.TeBuDi.model.Book;
 import com.tebudi.TeBuDi.service.BookService;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import jakarta.servlet.http.HttpSession;
+import com.tebudi.TeBuDi.dto.UserResponseDTO;
+import com.tebudi.TeBuDi.exception.UnauthorizedException;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -40,6 +47,22 @@ public class BookController {
     public ResponseEntity<ApiResponseDTO<BookResponseDTO>> getBookById(@PathVariable String id) {
         BookResponseDTO data = bookService.getBookById(id);
         return ResponseEntity.ok(ApiResponseDTO.success("Buku ditemukan!", data));
+    }
+
+    @GetMapping("/{id}/read")
+    public ResponseEntity<Resource> readBookFile(@PathVariable String id, HttpSession session) {
+        UserResponseDTO sessionUser = (UserResponseDTO) session.getAttribute("USER_SESSION");
+        
+        if (sessionUser == null) {
+            throw new UnauthorizedException("Silakan login terlebih dahulu untuk membaca buku.");
+        }
+
+        Resource resource = bookService.getBookFileAsResource(id, sessionUser.getId());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
     }
 
     @PostMapping

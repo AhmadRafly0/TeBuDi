@@ -44,3 +44,4 @@ postman/*
 repomix-output.xml
 data-storage/books/*
 !data-storage/books/.gitkeep
+repomix-output.xml
