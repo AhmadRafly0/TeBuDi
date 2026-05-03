@@ -1,13 +1,14 @@
 package com.tebudi.TeBuDi.repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.tebudi.TeBuDi.model.User;
 import com.tebudi.TeBuDi.model.UserSubscription;
-import java.util.Optional;
 
 
 public interface UserSubscriptionRepository extends JpaRepository<UserSubscription, String>{
@@ -17,7 +18,7 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
     )
     boolean hasActiveSubscription(@Param("userId") String userId, @Param("now") LocalDateTime now);
 
-    Optional<UserSubscription> findById(String userId);
 
     Optional<UserSubscription> findByUserId(String userId);
+    Optional<UserSubscription> findByUserAndStatusTrue(User user);
 }

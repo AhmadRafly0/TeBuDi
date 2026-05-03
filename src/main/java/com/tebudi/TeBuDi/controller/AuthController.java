@@ -14,6 +14,7 @@ import com.tebudi.TeBuDi.dto.UserLoginDTO;
 import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.service.UserService;
+import com.tebudi.TeBuDi.service.UserSubscriptionService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final UserService userService;
+    private final UserSubscriptionService UserSubscriptionService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegisterDTO request) {
