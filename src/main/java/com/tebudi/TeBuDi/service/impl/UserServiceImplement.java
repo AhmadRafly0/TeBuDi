@@ -1,5 +1,7 @@
 package com.tebudi.TeBuDi.service.impl;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -10,7 +12,9 @@ import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.dto.UserUpdateDTO;
 import com.tebudi.TeBuDi.exception.UnauthorizedException;
 import com.tebudi.TeBuDi.model.User;
+import com.tebudi.TeBuDi.model.UserSubscription;
 import com.tebudi.TeBuDi.repository.UserRepository;
+import com.tebudi.TeBuDi.repository.UserSubscriptionRepository;
 import com.tebudi.TeBuDi.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +27,7 @@ public class UserServiceImplement implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    
+    private final UserSubscriptionRepository userSubscriptionRepository;
 
     @Override
     public UserResponseDTO register(UserRegisterDTO request){
@@ -42,6 +46,17 @@ public class UserServiceImplement implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User saved = userRepository.save(user);
+
+        UserSubscription subscription = new UserSubscription();
+        subscription.setUser(saved);
+        
+        LocalDateTime now = LocalDateTime.now();
+        subscription.setStartDate(now);
+        subscription.setEndDate(now);
+        subscription.setStatus(false);
+
+        userSubscriptionRepository.save(subscription);
+
         return toResponse(saved);
     }
 
