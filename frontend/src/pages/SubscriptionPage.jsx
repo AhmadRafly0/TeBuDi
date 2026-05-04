@@ -34,6 +34,8 @@ const SubscriptionCard = ({ plan, onSelect, loadingPlanId }) => {
       className="relative overflow-hidden rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full bg-white"
       style={{ border: `1px solid ${colors.beige}` }}
     >
+
+      
       {!plan.hasAds && (
         <div className="absolute top-0 right-0 p-2">
           <span className="bg-yellow-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter text-black">

@@ -156,7 +156,7 @@ return (
                 <p className="text-sm text-gray-500 mb-2 truncate">{book.author}</p>
                 <div className="flex items-center gap-1 text-yellow-500">
                   <Star size={14} fill="currentColor" />
-                  <span className="text-xs font-bold text-gray-600">4.8</span>
+                  <span className="text-xs font-bold text-gray-600">0.0</span>
                 </div>
               </div>
             ))}
