@@ -3,6 +3,8 @@ import { Toaster } from 'react-hot-toast';
 import LoginPage    from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+
+
 import FavouritePage from "./pages/FavouritePage";
 import CategoryPage from './pages/CategoryPage';
 import ProfilePage from './pages/ProfilePage';
