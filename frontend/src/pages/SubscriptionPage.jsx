@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react'; // Menambahkan ikon panah
 
 const colors = {
   white: "#FFFFFF",
@@ -34,8 +35,6 @@ const SubscriptionCard = ({ plan, onSelect, loadingPlanId }) => {
       className="relative overflow-hidden rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full bg-white"
       style={{ border: `1px solid ${colors.beige}` }}
     >
-
-      
       {!plan.hasAds && (
         <div className="absolute top-0 right-0 p-2">
           <span className="bg-yellow-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter text-black">
@@ -163,10 +162,26 @@ const SubscriptionPage = () => {
   return (
     <div className="min-h-screen py-16 px-4" style={{ backgroundColor: colors.lightBeige }}>
       <div className="max-w-6xl mx-auto">
+        
+        {/* Tombol Kembali ke Beranda */}
+        <div className="mb-10">
+          <button
+            onClick={() => navigate('/home')}
+            className="group flex items-center gap-2 font-bold transition-all hover:translate-x-[-4px]"
+            style={{ color: colors.textDark }}
+          >
+            <div className="p-2 rounded-full bg-white shadow-sm group-hover:shadow-md transition-all">
+              <ArrowLeft size={20} strokeWidth={3} style={{ color: colors.brown }} />
+            </div>
+            <span className="text-sm uppercase tracking-widest">Kembali ke Beranda</span>
+          </button>
+        </div>
+
         <header className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4" style={{ color: colors.textDark }}>
             Subscription Plan
           </h1>
+          <p className="text-gray-500">Pilih paket terbaik untuk menikmati literasi tanpa batas</p>
         </header>
 
         {checkoutError && (
