@@ -13,6 +13,13 @@ const colors = {
   teal: "#1a7a8a",
 };
 
+const CATEGORIES = [
+  { value: 1, label: "Fiksi" },
+  { value: 2, label: "Non-Fiksi" },
+  { value: 3, label: "Sains" },
+  { value: 4, label: "Teknologi" },
+  { value: 5, label: "Sejarah" },
+];
 
 export default function HomePage() {
   const [books, setBooks] = useState([]);
@@ -72,7 +79,7 @@ export default function HomePage() {
     }
   };
 
-  return (
+return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
@@ -121,7 +128,7 @@ export default function HomePage() {
               <div 
                 key={book.id} 
                 className="group cursor-pointer"
-                onClick={() => setSelectedBook(book)}
+                onClick={() => setSelectedBook(book)} /* BUKA MODAL DI SINI */
               >
                 <div className="relative aspect-[3/4] mb-4 overflow-hidden rounded-2xl shadow-md transition-transform duration-300 group-hover:-translate-y-2">
                   <img 
@@ -164,7 +171,9 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* MODAL POP-UP DESKRIPSI BUKU */}
+      {/* 
+        MODAL POP-UP DESKRIPSI BUKU 
+      */}
       {selectedBook && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
