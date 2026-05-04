@@ -6,4 +6,5 @@ import com.tebudi.TeBuDi.dto.PaymentCallbackResponseDTO;
 public interface SubscriptionService {
     CheckoutResponseDTO createPendingTransaction(String userId, Integer planId);
     PaymentCallbackResponseDTO processSuccessfulPayment(String transactionId);
+    CheckoutResponseDTO cancelTransaction(String transactionId);
 }

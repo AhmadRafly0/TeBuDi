@@ -13,13 +13,6 @@ const colors = {
   teal: "#1a7a8a",
 };
 
-const CATEGORIES = [
-  { value: 1, label: "Fiksi" },
-  { value: 2, label: "Non-Fiksi" },
-  { value: 3, label: "Sains" },
-  { value: 4, label: "Teknologi" },
-  { value: 5, label: "Sejarah" },
-];
 
 export default function HomePage() {
   const [books, setBooks] = useState([]);
@@ -267,3 +260,4 @@ export default function HomePage() {
     </DashboardLayout>
   );
 }
+
