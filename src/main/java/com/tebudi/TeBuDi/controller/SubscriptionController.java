@@ -52,4 +52,11 @@ public class SubscriptionController {
         );
         return ResponseEntity.ok(ApiResponseDTO.success("Pembayaran berhasil dan langganan aktif.", response));
     }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancelTransaction(@RequestBody PaymentCallbackRequestDTO request) {
+        CheckoutResponseDTO failedTransaction = subscriptionService.cancelTransaction(request.getTransactionId());
+
+        return ResponseEntity.ok(ApiResponseDTO.success("Transaksi berhasil dibatalkan.", failedTransaction));
+    }
 } 

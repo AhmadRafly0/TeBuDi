@@ -10,7 +10,7 @@ const colors = {
   brown: "#B49E88",
   textDark: "#4A3F35",
   danger: "#e53e3e",
-  teal: "#1a7a8a",
+  teal: "#A3846B",
 };
 
 const ProfilePage = () => {
@@ -18,7 +18,6 @@ const ProfilePage = () => {
   const isUpdating = useRef(false);
   const isDeleting = useRef(false);
   const fileInputRef = useRef(null); // Ref untuk input file
-
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -143,8 +142,8 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4" style={{ backgroundColor: colors.lightBeige }}>
-      <div className="max-w-lg mx-auto space-y-6">
+    <div className="min-h-screen py-12 px-50 bg-stone-50">
+      <div className="max-w-200 mx-auto space-y-6">
         
         {/* Tombol Kembali */}
         <button 
@@ -164,7 +163,7 @@ const ProfilePage = () => {
               <input 
                 type="file" 
                 ref={fileInputRef} 
-                onChange={handleFileChange} 
+                onChange={handleFileChange} s
                 className="hidden" 
                 accept="image/*"
               />

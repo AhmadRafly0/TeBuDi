@@ -1,15 +1,24 @@
 package com.tebudi.TeBuDi.service.impl;
 
-import com.tebudi.TeBuDi.dto.CheckoutResponseDTO;
-import com.tebudi.TeBuDi.dto.PaymentCallbackResponseDTO;
-import com.tebudi.TeBuDi.model.*;
-import com.tebudi.TeBuDi.repository.*;
-import com.tebudi.TeBuDi.service.SubscriptionService;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import com.tebudi.TeBuDi.dto.CheckoutResponseDTO;
+import com.tebudi.TeBuDi.dto.PaymentCallbackResponseDTO;
+import com.tebudi.TeBuDi.model.SubscriptionPlan;
+import com.tebudi.TeBuDi.model.Transaction;
+import com.tebudi.TeBuDi.model.User;
+import com.tebudi.TeBuDi.model.UserSubscription;
+import com.tebudi.TeBuDi.repository.SubscriptionPlanRepository;
+import com.tebudi.TeBuDi.repository.TransactionRepository;
+import com.tebudi.TeBuDi.repository.UserRepository;
+import com.tebudi.TeBuDi.repository.UserSubscriptionRepository;
+import com.tebudi.TeBuDi.service.SubscriptionService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +54,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
-    public PaymentCallbackResponseDTO  processSuccessfulPayment(String transactionId) {
+    public PaymentCallbackResponseDTO processSuccessfulPayment(String transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
 
@@ -60,14 +69,41 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Integer durationDays = transaction.getPlan().getDurationDays();
         LocalDateTime now = LocalDateTime.now();
 
+        Optional<UserSubscription> existingSub = userSubscriptionRepository.findByUserId(user.getId());
+
+        if (existingSub.isPresent()) {
+            UserSubscription sub = existingSub.get();
+            sub.setStartDate(now);
+            sub.setEndDate(now.plusDays(durationDays));
+            sub.setStatus(true);
+            UserSubscription saved = userSubscriptionRepository.save(sub);
+            return toSubscriptionResponse(saved);
+        }
+
         UserSubscription newSub = new UserSubscription();
         newSub.setUser(user);
         newSub.setStartDate(now);
         newSub.setEndDate(now.plusDays(durationDays));
         newSub.setStatus(true);
-        
+
         UserSubscription saved = userSubscriptionRepository.save(newSub);
         return toSubscriptionResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public CheckoutResponseDTO cancelTransaction(String transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaksi tidak ditemukan"));
+
+        if (transaction.getStatus() != Transaction.TransactionStatus.PENDING) {
+            throw new RuntimeException("Gagal dibatalkan: Transaksi sudah " + transaction.getStatus());
+        }
+
+        transaction.setStatus(Transaction.TransactionStatus.FAILED);
+
+        Transaction saved =  transactionRepository.save(transaction);
+        return toResponse(saved);
     }
 
     private CheckoutResponseDTO toResponse(Transaction transaction) {
