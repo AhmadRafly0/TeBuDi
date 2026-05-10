@@ -10,6 +10,11 @@ import org.springframework.core.io.Resource;
 
 public interface BookService {
     List<Book> getAllBooks();
+
+    List<Book> searchByTitle(String title);
+    List<Book> searchByCategory(String categoryName);
+    List<Book> searchByAuthor(String author);
+
     BookResponseDTO getBookById(String id);
     
     BookResponseDTO saveBook(BookRegisterDTO book);

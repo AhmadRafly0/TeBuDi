@@ -13,37 +13,40 @@ const colors = {
   teal: "#1a7a8a",
 };
 
-const CATEGORIES = [
-  { value: 1, label: "Fiksi" },
-  { value: 2, label: "Non-Fiksi" },
-  { value: 3, label: "Sains" },
-  { value: 4, label: "Teknologi" },
-  { value: 5, label: "Sejarah" },
-];
-
 export default function HomePage() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [categories, setCategories] = useState([]);
+
   const [selectedBook, setSelectedBook] = useState(null);
   
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchBooks = async () => {
+useEffect(() => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('/api/books');
-        if (response.data.success) {
-          setBooks(response.data.data);
+        setLoading(true);
+        const [booksRes, categoriesRes] = await Promise.all([
+          axios.get('/api/books'),
+          axios.get('/api/categories')
+        ]);
+
+        if (booksRes.data.success) {
+          setBooks(booksRes.data.data);
+        }
+        if (categoriesRes.data.success) {
+          setCategories(categoriesRes.data?.data ?? categoriesRes.data ?? []);
         }
       } catch (error) {
-        console.error("Gagal mengambil data buku:", error);
+        console.error("Gagal mengambil data:", error);
+        toast.error("Gagal memuat data dari server.");
       } finally {
         setLoading(false);
       }
     };
-    fetchBooks();
+    
+    fetchData();
   }, []);
 
   const filteredBooks = books.filter(book => 
@@ -51,10 +54,15 @@ export default function HomePage() {
     book.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getCategoryName = (catValue) => {
-    return CATEGORIES.find(c => c.value === catValue)?.label || "Kategori Umum";
-  };
+const getCategoryName = (catValue) => {
+    if (catValue && typeof catValue === 'object') {
+      return catValue.nameCategory || "Kategori Umum";
+    }
 
+    const matchedCategory = categories.find(c => String(c.idCategory) === String(catValue));
+    
+    return matchedCategory?.nameCategory || "Kategori Umum";
+  };
   const handleReadClick = async (book) => {
     if (!book.isPremium) {
       navigate(`/read/${book.id}`);
@@ -212,7 +220,7 @@ return (
 
                 <div className="mb-2">
                    <span className="text-xs font-bold tracking-widest text-[#B49E88] uppercase">
-                     {getCategoryName(selectedBook.category)}
+                     {selectedBook.category?.name || "Kategori Umum"}
                    </span>
                 </div>
                 

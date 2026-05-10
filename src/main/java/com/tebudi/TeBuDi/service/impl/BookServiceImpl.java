@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+//import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -45,6 +46,21 @@ public class BookServiceImpl implements BookService{
     @Override
     public List<Book> getAllBooks(){
         return bookRepository.findAll();
+    }
+
+    @Override
+    public List<Book> searchByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
+    public List<Book> searchByCategory(String categoryName) {
+        return bookRepository.findByCategoryNameContainingIgnoreCase(categoryName);
+    }
+
+    @Override
+    public List<Book> searchByAuthor(String author) {
+        return bookRepository.findByAuthorContainingIgnoreCase(author);
     }
 
     @Override 
@@ -206,4 +222,6 @@ public class BookServiceImpl implements BookService{
             throw new RuntimeException("Gagal membaca file buku: " + e.getMessage(), e);
         }
     }
+
+
 }

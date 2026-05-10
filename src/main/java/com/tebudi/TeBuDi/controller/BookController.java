@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tebudi.TeBuDi.dto.ApiResponseDTO; 
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
@@ -40,6 +41,28 @@ public class BookController {
     public ResponseEntity<ApiResponseDTO<List<Book>>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Daftar buku berhasil diambil", books));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponseDTO<List<Book>>> searchBooks(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String author) {
+        
+        List<Book> books;
+
+        if (title != null && !title.isBlank()) {
+            books = bookService.searchByTitle(title);
+        } else if (category != null && !category.isBlank()) {
+            books = bookService.searchByCategory(category);
+        } else if (author != null && !author.isBlank()) {
+            books = bookService.searchByAuthor(author);
+        } else {
+            // Jika dikirim ke /api/books/search tanpa parameter
+            books = bookService.getAllBooks(); 
+        }
+
+        return ResponseEntity.ok(ApiResponseDTO.success("Pencarian buku berhasil", books));
     }
 
     @GetMapping("/{id}")
@@ -82,5 +105,7 @@ public class BookController {
     public ResponseEntity<ApiResponseDTO<Void>> deleteBook(@PathVariable String id) {
         bookService.deleteBook(id);
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Buku berhasil dihapus", null));
+    
+    
     }
 }
