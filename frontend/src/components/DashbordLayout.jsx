@@ -1,14 +1,12 @@
-// frontend/src/components/DashbordLayout.jsx
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { SearchProvider, useSearch } from "./SearchContext";
 import { useState } from "react";
 import { BookOpen, Star, X } from "lucide-react";
-import BookModal from "./BookModal"; // ← import modular
+import BookModal from "./BookModal";
 
 const colors = { brown: "#B49E88", textDark: "#4A3F35" };
 
-// ─── Search Results View (rendered inside <main>) ─────────────────────────────
 function SearchResultsView() {
   const { searchResults, searchQuery, setSearchResults, setSearchQuery, isSubscribed } = useSearch();
   const [selectedBook, setSelectedBook] = useState(null);
@@ -78,12 +76,11 @@ function SearchResultsView() {
         )}
       </div>
 
-      {/* Modal — sekarang pakai komponen modular */}
       {selectedBook && (
         <BookModal
           book={selectedBook}
           onClose={() => setSelectedBook(null)}
-          isSubscribed={isSubscribed} // langsung dari SearchContext, tanpa API call ulang
+          isSubscribed={isSubscribed}
         />
       )}
     </>
@@ -109,7 +106,6 @@ function LayoutInner({ children }) {
   );
 }
 
-// ─── Public export ────────────────────────────────────────────────────────────
 export default function DashboardLayout({ children }) {
   return (
     <SearchProvider>

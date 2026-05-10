@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, RefreshCw, Search, AlertCircle, X } from "lucide-react";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
 
 const EMPTY_FORM = {
   id: "",
@@ -225,11 +225,11 @@ function BookModal({ initial, onClose, onSuccess, categories }) {
       formData.append("isPremium", form.isPremium);
 
       if (isEdit) {
-        await axios.put(`${BASE_URL}/api/books/${initial.id}`, formData, {
+        await axios.put(`/api/books/${initial.id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await axios.post(`${BASE_URL}/api/books`, formData, {
+        await axios.post(`/api/books`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -421,8 +421,8 @@ export default function ManagementBookPage() {
       setLoading(true);
       setFetchError(null);
       const [booksRes, categoriesRes] = await Promise.all([
-        axios.get(`${BASE_URL}/api/books`),
-        axios.get(`${BASE_URL}/api/categories`)
+        axios.get(`/api/books`),
+        axios.get(`/api/categories`)
       ]);
 
       setBooks(booksRes.data?.data ?? booksRes.data ?? []);
@@ -442,7 +442,7 @@ export default function ManagementBookPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await axios.delete(`${BASE_URL}/api/books/${deleteTarget.id}`);
+      await axios.delete(`/api/books/${deleteTarget.id}`);
       await fetchData();
       setDeleteTarget(null);
     } catch {
