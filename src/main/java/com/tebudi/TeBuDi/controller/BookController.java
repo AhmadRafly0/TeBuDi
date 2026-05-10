@@ -3,7 +3,10 @@ package com.tebudi.TeBuDi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,16 +21,12 @@ import com.tebudi.TeBuDi.dto.ApiResponseDTO;
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
+import com.tebudi.TeBuDi.dto.UserResponseDTO;
+import com.tebudi.TeBuDi.exception.UnauthorizedException;
 import com.tebudi.TeBuDi.model.Book;
 import com.tebudi.TeBuDi.service.BookService;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import jakarta.servlet.http.HttpSession;
-import com.tebudi.TeBuDi.dto.UserResponseDTO;
-import com.tebudi.TeBuDi.exception.UnauthorizedException;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -74,7 +73,7 @@ public class BookController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<BookResponseDTO>> updateBook(
             @PathVariable String id,
-            @Valid @ModelAttribute BookUpdateDTO request) {  // ✅ @ModelAttribute untuk multipart
+            @Valid @ModelAttribute BookUpdateDTO request) {
         BookResponseDTO data = bookService.updateBook(id, request);
         return ResponseEntity.ok(ApiResponseDTO.success("Data buku berhasil diperbarui!", data));
     }
