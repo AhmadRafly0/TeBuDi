@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Camera, Loader2 } from 'lucide-react'; // Tambahkan lucide-react untuk ikon
+import { ArrowLeft, Camera, Loader2, LogOut } from 'lucide-react'; // Tambahkan lucide-react untuk ikon
+import { useAuth } from "../components/AuthContext";
 
 const colors = {
   lightBeige: "#F5F1ED",
@@ -24,6 +25,7 @@ const ProfilePage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false); // Loading khusus upload
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -120,6 +122,8 @@ const ProfilePage = () => {
     try {
       const response = await axios.delete(`/api/users/${user.id}`);
       if (response.data.success) {
+        console.log(response.data);
+        await logout();
         toast.success('Akun berhasil dihapus.');
         navigate('/login');
       }

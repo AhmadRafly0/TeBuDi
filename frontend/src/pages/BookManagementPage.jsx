@@ -1,17 +1,9 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, RefreshCw, Search, AlertCircle, X } from "lucide-react";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
-const CATEGORIES = [
-  { value: 1, label: "Fiksi" },
-  { value: 2, label: "Non-Fiksi" },
-  { value: 3, label: "Sains" },
-  { value: 4, label: "Teknologi" },
-  { value: 5, label: "Sejarah" },
-];
 
 const EMPTY_FORM = {
   id: "",
@@ -25,9 +17,9 @@ const EMPTY_FORM = {
 };
 
 // ─── Book Card ────────────────────────────────────────────────────────────────
-function BookCard({ book, onEdit, onDelete }) {
-  const catLabel =
-    CATEGORIES.find((c) => c.value === book.category)?.label ?? "—";
+function BookCard({ book, onEdit, onDelete, categories }) {
+  // Mencari nama kategori berdasarkan ID secara dinamis
+  const catLabel = categories.find((c) => c.idCategory === book.category)?.nameCategory ?? "-";
 
   return (
     <div className="group relative flex flex-col bg-[#F9F8F6] border border-[#D9CFC7] rounded-lg overflow-hidden hover:border-[#C9B59C] hover:shadow-md transition-all duration-200">
@@ -203,7 +195,7 @@ const inputCls =
   "w-full px-3 py-2 text-sm border border-[#D9CFC7] rounded bg-white text-gray-800 placeholder:text-gray-300 focus:outline-none focus:border-[#C9B59C] focus:ring-1 focus:ring-[#C9B59C] transition disabled:bg-gray-100";
 
 // ─── Book Form Modal ──────────────────────────────────────────────────────────
-function BookModal({ initial, onClose, onSuccess }) {
+function BookModal({ initial, onClose, onSuccess, categories }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(initial ? { ...initial, bookFile: null } : { ...EMPTY_FORM });
   const [loading, setLoading] = useState(false);
@@ -233,11 +225,11 @@ function BookModal({ initial, onClose, onSuccess }) {
       formData.append("isPremium", form.isPremium);
 
       if (isEdit) {
-        await axios.put(`${BASE_URL}/api/books/${initial.id}`, formData, {
+        await axios.put(`/api/books/${initial.id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await axios.post(`${BASE_URL}/api/books`, formData, {
+        await axios.post(`/api/books`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
@@ -295,17 +287,17 @@ function BookModal({ initial, onClose, onSuccess }) {
               />
             </Field>
             <Field label="Kategori" required>
-              <select
-                className={inputCls}
-                value={form.category}
-                disabled={loading}
-                onChange={(e) => set("category", Number(e.target.value))}
-              >
-                <option value="">Pilih kategori</option>
-                {CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
+                <select
+                  className={inputCls}
+                  value={form.category}
+                  disabled={loading}
+                  onChange={(e) => set("category", Number(e.target.value))}
+                >
+                  <option value="">Pilih kategori</option>
+                  {categories.map((c) => (
+                    <option key={c.idCategory} value={c.idCategory}>{c.nameCategory}</option>
+                  ))}
+                </select>
             </Field>
           </div>
 
@@ -411,6 +403,7 @@ function StatCard({ label, value, accent }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ManagementBookPage() {
   const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]); // category state
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
 
@@ -422,27 +415,35 @@ export default function ManagementBookPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchBooks = useCallback(async () => {
+  // Fetch Buku dan Kategori bersamaan
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setFetchError(null);
-      const res = await axios.get(`${BASE_URL}/api/books`);
-      setBooks(res.data?.data ?? res.data ?? []);
+      const [booksRes, categoriesRes] = await Promise.all([
+        axios.get(`/api/books`),
+        axios.get(`/api/categories`)
+      ]);
+
+      setBooks(booksRes.data?.data ?? booksRes.data ?? []);
+      setCategories(categoriesRes.data?.data ?? categoriesRes.data ?? []);
     } catch {
-      setFetchError("Gagal memuat data buku. Periksa koneksi ke server.");
+      setFetchError("Gagal memuat data. Periksa koneksi ke server.");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useState(() => { fetchBooks(); }, []);
+  useEffect(() => { 
+    fetchData(); 
+  }, [fetchData]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await axios.delete(`${BASE_URL}/api/books/${deleteTarget.id}`);
-      await fetchBooks();
+      await axios.delete(`/api/books/${deleteTarget.id}`);
+      await fetchData();
       setDeleteTarget(null);
     } catch {
       alert("Gagal menghapus buku. Coba lagi.");
@@ -528,12 +529,13 @@ export default function ManagementBookPage() {
             className="px-3 py-2 text-sm border border-[#D9CFC7] rounded bg-white text-gray-700 focus:outline-none focus:border-[#C9B59C] transition"
           >
             <option value="">Semua kategori</option>
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={String(c.value)}>{c.label}</option>
+            {/* Menggunakan daftar kategori dinamis untuk filter */}
+            {categories.map((c) => (
+              <option key={c.idCategory} value={String(c.idCategory)}>{c.nameCategory}</option>
             ))}
           </select>
           <button
-            onClick={fetchBooks}
+            onClick={fetchData}
             title="Refresh"
             className="px-3 py-2 border border-[#D9CFC7] rounded bg-white text-gray-500 hover:bg-[#EFE9E3] hover:text-gray-800 transition"
           >
@@ -550,7 +552,7 @@ export default function ManagementBookPage() {
           <div className="bg-[#EFE9E3] rounded-lg border border-[#D9CFC7] p-8 text-center">
             <p className="text-sm text-red-500 mb-3">{fetchError}</p>
             <button
-              onClick={fetchBooks}
+              onClick={fetchData}
               className="text-sm px-4 py-2 border border-[#D9CFC7] rounded hover:bg-[#F9F8F6] transition"
             >
               Coba lagi
@@ -572,6 +574,7 @@ export default function ManagementBookPage() {
               <BookCard
                 key={book.id}
                 book={book}
+                categories={categories}
                 onEdit={(b) => setModal({ mode: "edit", book: b })}
                 onDelete={(id) => setDeleteTarget(books.find((b) => b.id === id))}
               />
@@ -583,8 +586,9 @@ export default function ManagementBookPage() {
       {modal && (
         <BookModal
           initial={modal.mode === "edit" ? modal.book : null}
+          categories={categories}
           onClose={() => setModal(null)}
-          onSuccess={fetchBooks}
+          onSuccess={fetchData}
         />
       )}
 

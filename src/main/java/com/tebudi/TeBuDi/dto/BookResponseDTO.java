@@ -8,12 +8,13 @@ import lombok.Data;
 public class BookResponseDTO {
 
     private String id;
-    private int category;
+    private Integer categoryId;
+    private String categoryName;
     private String title;
     private String author;
     private String description;
     private String coverURL;
     private String fileURL;
-    private boolean isPremium;
+    private Boolean isPremium;
 
 }

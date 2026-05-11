@@ -3,7 +3,7 @@ import { Plus, Pencil, Trash2, AlertCircle, X, RefreshCw, Search } from 'lucide-
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-// ─── Toggle ───────────────────────────────────────────────────────────────────
+
 function Toggle({ checked, onChange, disabled }) {
   return (
     <button
@@ -25,7 +25,6 @@ function Toggle({ checked, onChange, disabled }) {
   );
 }
 
-// ─── Field ────────────────────────────────────────────────────────────────────
 function Field({ label, required, children, hint }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -42,7 +41,6 @@ function Field({ label, required, children, hint }) {
 const inputCls =
   "w-full px-3 py-2 text-sm border border-[#D9CFC7] rounded bg-white text-gray-800 placeholder:text-gray-300 focus:outline-none focus:border-[#C9B59C] focus:ring-1 focus:ring-[#C9B59C] transition disabled:bg-gray-100";
 
-// ─── Plan Card ────────────────────────────────────────────────────────────────
 function PlanCard({ plan, onEdit, onDelete }) {
   const formattedPrice = new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -52,9 +50,7 @@ function PlanCard({ plan, onEdit, onDelete }) {
 
   return (
     <div className="group relative flex flex-col bg-[#F9F8F6] border border-[#D9CFC7] rounded-lg overflow-hidden hover:border-[#C9B59C] hover:shadow-md transition-all duration-200">
-      {/* Top accent area */}
       <div className="relative h-28 flex flex-col items-center justify-center bg-[#EFE9E3] gap-1 px-3">
-        {/* Icon */}
         <svg
           className="w-8 h-8 text-[#C9B59C]"
           viewBox="0 0 24 24"
@@ -66,7 +62,6 @@ function PlanCard({ plan, onEdit, onDelete }) {
           <path d="M3 9h18M9 21V9" />
         </svg>
 
-        {/* Has ads badge */}
         <span
           className={`absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
             plan.hasAds
@@ -77,13 +72,11 @@ function PlanCard({ plan, onEdit, onDelete }) {
           {plan.hasAds ? "Dengan Iklan" : "Tanpa Iklan"}
         </span>
 
-        {/* Plan ID badge */}
         <span className="absolute top-2 left-2 text-[10px] text-gray-400 font-mono bg-white/70 px-1.5 py-0.5 rounded">
           #{plan.planId}
         </span>
       </div>
 
-      {/* Info */}
       <div className="flex flex-col flex-1 p-3 gap-1">
         <h3 className="text-sm font-semibold text-gray-800 leading-tight line-clamp-2">
           {plan.planName}
@@ -92,7 +85,6 @@ function PlanCard({ plan, onEdit, onDelete }) {
         <p className="text-xs text-gray-500">{plan.durationDays} hari</p>
       </div>
 
-      {/* Actions */}
       <div className="flex border-t border-[#D9CFC7]">
         <button
           onClick={() => onEdit(plan)}
@@ -112,7 +104,6 @@ function PlanCard({ plan, onEdit, onDelete }) {
   );
 }
 
-// ─── Plan Form Modal ──────────────────────────────────────────────────────────
 function PlanModal({ initial, onClose, onSubmit, loading }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(
@@ -145,7 +136,6 @@ function PlanModal({ initial, onClose, onSubmit, loading }) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="bg-[#F9F8F6] rounded-lg shadow-xl w-full max-w-md border border-[#D9CFC7] overflow-hidden flex flex-col max-h-[90vh]">
-        {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-[#D9CFC7] bg-[#EFE9E3]">
           <div>
             <h2 className="text-lg font-semibold text-gray-800">
@@ -160,7 +150,6 @@ function PlanModal({ initial, onClose, onSubmit, loading }) {
           </button>
         </div>
 
-        {/* Body */}
         <div className="overflow-y-auto p-6 flex flex-col gap-4">
           <Field label="Nama Paket" required>
             <input
@@ -213,7 +202,6 @@ function PlanModal({ initial, onClose, onSubmit, loading }) {
           )}
         </div>
 
-        {/* Footer */}
         <div className="pt-4 flex justify-end gap-3 border-t border-[#D9CFC7] px-6 pb-5 bg-[#F9F8F6]">
           <button
             onClick={onClose}
@@ -235,7 +223,6 @@ function PlanModal({ initial, onClose, onSubmit, loading }) {
   );
 }
 
-// ─── Delete Confirm Modal ─────────────────────────────────────────────────────
 function DeleteConfirm({ planName, onConfirm, onCancel, loading }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -270,7 +257,6 @@ function DeleteConfirm({ planName, onConfirm, onCancel, loading }) {
   );
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
 function StatCard({ label, value, accent }) {
   return (
     <div className={`flex flex-col gap-1 rounded-lg px-4 py-3 bg-[#EFE9E3] border ${accent ? "border-[#C9B59C]" : "border-[#D9CFC7]"}`}>
@@ -280,16 +266,15 @@ function StatCard({ label, value, accent }) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SubscriptionAdminPage() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
 
   const [search, setSearch] = useState('');
-  const [tabFilter, setTabFilter] = useState('all'); // all | ads | no-ads
+  const [tabFilter, setTabFilter] = useState('all');
 
-  const [modal, setModal] = useState(null); // null | { mode: 'add' } | { mode: 'edit', plan }
+  const [modal, setModal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -357,7 +342,6 @@ export default function SubscriptionAdminPage() {
     <div className="min-h-screen bg-[#F9F8F6] font-sans">
       <div className="max-w-6xl mx-auto p-6 md:p-10">
 
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Paket Langganan</h1>
@@ -372,7 +356,6 @@ export default function SubscriptionAdminPage() {
           </button>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <StatCard label="Total Paket" value={plans.length} />
           <StatCard label="Tanpa Iklan" value={totalNoAds} accent />
@@ -400,7 +383,6 @@ export default function SubscriptionAdminPage() {
           ))}
         </div>
 
-        {/* Search & Refresh */}
         <div className="flex gap-2 mb-6">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -421,7 +403,6 @@ export default function SubscriptionAdminPage() {
           </button>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C9B59C]"></div>

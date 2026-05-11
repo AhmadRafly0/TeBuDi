@@ -2,6 +2,7 @@ package com.tebudi.TeBuDi.service.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,35 +10,57 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+//import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import com.tebudi.TeBuDi.exception.UnauthorizedException;
-import com.tebudi.TeBuDi.service.UserSubscriptionService;
-
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
+import com.tebudi.TeBuDi.exception.UnauthorizedException;
 import com.tebudi.TeBuDi.model.Book;
+import com.tebudi.TeBuDi.model.Category;
 import com.tebudi.TeBuDi.repository.BookRepository;
+import com.tebudi.TeBuDi.repository.CategoryRepository;
 import com.tebudi.TeBuDi.service.BookService;
+import com.tebudi.TeBuDi.service.UserSubscriptionService;
 
 @Service
 public class BookServiceImpl implements BookService{
+   
     @Autowired 
     private BookRepository bookRepository;
 
     @Autowired
     private UserSubscriptionService userSubscriptionService;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+
     @Override
     public List<Book> getAllBooks(){
         return bookRepository.findAll();
+    }
+
+    @Override
+    public List<Book> searchByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    @Override
+    public List<Book> searchByCategory(String categoryName) {
+        return bookRepository.findByCategoryNameContainingIgnoreCase(categoryName);
+    }
+
+    @Override
+    public List<Book> searchByAuthor(String author) {
+        return bookRepository.findByAuthorContainingIgnoreCase(author);
     }
 
     @Override 
@@ -54,6 +77,9 @@ public class BookServiceImpl implements BookService{
         if (bookRepository.existsById(request.getId())) {
             throw new RuntimeException("ID Book sudah terdaftar");
         }
+
+        Category category = categoryRepository.findById(request.getCategory())
+                .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
 
         MultipartFile file = request.getBookFile();
 
@@ -80,7 +106,7 @@ public class BookServiceImpl implements BookService{
 
             Book book = new Book();
             book.setId(request.getId());
-            book.setCategory(request.getCategory());
+            book.setCategory(category);
             book.setTitle(request.getTitle());
             book.setAuthor(request.getAuthor());
             book.setDescription(request.getDescription());
@@ -103,7 +129,11 @@ public class BookServiceImpl implements BookService{
                     .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan!"));
 
         // ── Update field teks ──────────────────────────────────────────────────
-        if (request.getCategory() != null)                 book.setCategory(request.getCategory());
+        if (request.getCategory() != null) {
+            Category category = categoryRepository.findById(request.getCategory())
+                    .orElseThrow(() -> new RuntimeException("Kategori tidak ditemukan"));
+            book.setCategory(category);
+        }
         if (StringUtils.hasText(request.getTitle()))       book.setTitle(request.getTitle());
         if (StringUtils.hasText(request.getAuthor()))      book.setAuthor(request.getAuthor());
         if (StringUtils.hasText(request.getDescription())) book.setDescription(request.getDescription());
@@ -159,7 +189,8 @@ public class BookServiceImpl implements BookService{
     public BookResponseDTO toResponse(Book book) {
         return BookResponseDTO.builder()
                 .id(book.getId())
-                .category(book.getCategory())
+                .categoryId(book.getCategory().getId())      
+                .categoryName(book.getCategory().getName())   
                 .title(book.getTitle())
                 .author(book.getAuthor())
                 .description(book.getDescription())
@@ -173,6 +204,7 @@ public class BookServiceImpl implements BookService{
     public Resource getBookFileAsResource(String bookId, String userId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan!"));
+
         if (Boolean.TRUE.equals(book.getIsPremium())) {
             if (userId == null || !userSubscriptionService.isUserSubscribed(userId)) {
                 throw new UnauthorizedException("Akses ditolak! Kamu harus berlangganan paket premium untuk membaca buku ini.");
@@ -186,8 +218,10 @@ public class BookServiceImpl implements BookService{
             } else {
                 throw new RuntimeException("File dokumen buku tidak ditemukan di server.");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException | MalformedURLException e) {
             throw new RuntimeException("Gagal membaca file buku: " + e.getMessage(), e);
         }
     }
+
+
 }
