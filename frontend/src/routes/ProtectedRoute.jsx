@@ -1,26 +1,43 @@
-// frontend/src/routes/ProtectedRoute.jsx
+/**
+ * @file routes/ProtectedRoute.jsx
+ * @description Route guards untuk mengontrol akses halaman berdasarkan status autentikasi.
+ *
+ * Tiga jenis guard:
+ * - ProtectedRoute: hanya bisa diakses jika sudah login
+ * - AdminRoute: hanya bisa diakses jika sudah login DAN role === "admin"
+ * - PublicOnlyRoute: hanya bisa diakses jika BELUM login (untuk /login, /register)
+ *
+ * Semua guard menampilkan loading screen saat session sedang dicek.
+ *
+ * @example
+ * // Di App.jsx:
+ * <Route element={<ProtectedRoute />}>
+ *   <Route path="/home" element={<HomePage />} />
+ * </Route>
+ *
+ * <Route element={<AdminRoute />}>
+ *   <Route path="/admin/books" element={<BookManagementPage />} />
+ * </Route>
+ *
+ * <Route element={<PublicOnlyRoute />}>
+ *   <Route path="/login" element={<LoginPage />} />
+ * </Route>
+ */
+
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 /**
- * ProtectedRoute — hanya bisa diakses kalau sudah login.
- * Kalau belum login → redirect ke /login, sambil simpan tujuan aslinya
- * di state supaya setelah login bisa balik ke halaman yang dimaksud.
- *
- * Cara pakai di routes:
- *   <Route element={<ProtectedRoute />}>
- *     <Route path="/home" element={<HomePage />} />
- *     <Route path="/profile" element={<ProfilePage />} />
- *   </Route>
+ * Guard untuk halaman yang membutuhkan login.
+ * Jika belum login → redirect ke /login, sambil simpan tujuan asli di state
+ * agar setelah login bisa balik ke halaman yang dimaksud.
  */
 export function ProtectedRoute() {
   const { isLoggedIn, isLoading } = useAuth();
   const location = useLocation();
 
-  // Tunggu cek session selesai dulu — jangan langsung redirect
-  if (isLoading) {
-    return <AuthLoadingScreen />;
-  }
+  // Tunggu cek session selesai — jangan langsung redirect
+  if (isLoading) return <AuthLoadingScreen />;
 
   if (!isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -30,30 +47,22 @@ export function ProtectedRoute() {
 }
 
 /**
- * AdminRoute — hanya bisa diakses kalau sudah login DAN role === "admin".
- * Kalau belum login → ke /login.
- * Kalau sudah login tapi bukan admin → ke /home (forbidden).
- *
- * Cara pakai di routes:
- *   <Route element={<AdminRoute />}>
- *     <Route path="/admin/books" element={<BookManagementPage />} />
- *     <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
- *   </Route>
+ * Guard untuk halaman admin.
+ * Jika belum login → redirect ke /login.
+ * Jika sudah login tapi bukan admin → redirect ke /home (forbidden).
  */
 export function AdminRoute() {
   const { isLoggedIn, isAdmin, isLoading } = useAuth();
   const location = useLocation();
 
-  if (isLoading) {
-    return <AuthLoadingScreen />;
-  }
+  if (isLoading) return <AuthLoadingScreen />;
 
   if (!isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!isAdmin) {
-    // Sudah login tapi bukan admin → tolak, arahkan ke home
+    // Sudah login tapi bukan admin → tolak akses
     return <Navigate to="/home" replace />;
   }
 
@@ -61,22 +70,13 @@ export function AdminRoute() {
 }
 
 /**
- * PublicOnlyRoute — hanya bisa diakses kalau BELUM login.
- * Berguna untuk /login dan /register supaya user yang sudah login
- * tidak bisa balik ke halaman login.
- *
- * Cara pakai di routes:
- *   <Route element={<PublicOnlyRoute />}>
- *     <Route path="/login" element={<LoginPage />} />
- *     <Route path="/register" element={<RegisterPage />} />
- *   </Route>
+ * Guard untuk halaman publik (login, register).
+ * Jika sudah login → redirect ke /home agar tidak bisa balik ke halaman login.
  */
 export function PublicOnlyRoute() {
   const { isLoggedIn, isLoading } = useAuth();
 
-  if (isLoading) {
-    return <AuthLoadingScreen />;
-  }
+  if (isLoading) return <AuthLoadingScreen />;
 
   if (isLoggedIn) {
     return <Navigate to="/home" replace />;
@@ -85,7 +85,10 @@ export function PublicOnlyRoute() {
   return <Outlet />;
 }
 
-// ─── Loading screen saat cek session ─────────────────────────────────────────
+/**
+ * Loading screen yang ditampilkan saat session sedang dicek.
+ * Mencegah flash redirect sebelum status auth diketahui.
+ */
 function AuthLoadingScreen() {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[#F9F7F4]">

@@ -1,36 +1,52 @@
-// frontend/src/pages/LoginPage.jsx
-import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import LoginForm from '../components/LoginForm';
-import { useAuth } from '../components/AuthContext';
+/**
+ * @file pages/LoginPage.jsx
+ * @description Halaman login pengguna.
+ *
+ * Menangani validasi form, request login ke API, dan update AuthContext.
+ * Tampilan form didelegasikan ke komponen LoginForm.
+ */
 
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import axios from "axios";
+
+// Komponen dan context modular
+import LoginForm from "../components/auth/LoginForm";
+import { useAuth } from "../context/AuthContext";
+
+/**
+ * Halaman login.
+ * Setelah login berhasil, update AuthContext dan redirect ke /home.
+ */
 export default function LoginPage() {
   const navigate = useNavigate();
   const { refetchUser } = useAuth();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Validasi input form sebelum submit.
+   * @returns {string|null} Pesan error, atau null jika valid
+   */
   const validate = () => {
-    if (!form.email || !form.password) {
-      return "Semua field harus diisi!! >:(";
-    }
+    if (!form.email || !form.password) return "Semua field harus diisi!! >:(";
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      return "Email tidak valid!! >:(";
-    }
-    if (form.password.length < 8) {
-      return "Password minimal 8 karakter!! >:(";
-    }
+    if (!emailRegex.test(form.email)) return "Email tidak valid!! >:(";
+    if (form.password.length < 8) return "Password minimal 8 karakter!! >:(";
     return null;
   };
 
+  /** Handler perubahan input form */
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Submit form login ke API.
+   * Setelah berhasil, refetch user di AuthContext agar ProtectedRoute tahu user sudah login.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -41,17 +57,14 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-
     try {
-      await axios.post('/api/auth/login', form, { withCredentials: true });
-
-      // Penting: update AuthContext supaya ProtectedRoute tahu user sudah login
+      await axios.post("/api/auth/login", form, { withCredentials: true });
+      // Update AuthContext supaya ProtectedRoute tahu user sudah login
       await refetchUser();
-
-      toast.success('Selamat datang di TeBuDi!! :D');
-      navigate('/home');
-    } catch (error) {
-      toast.error('Email atau password salah.. :(');
+      toast.success("Selamat datang di TeBuDi!! :D");
+      navigate("/home");
+    } catch {
+      toast.error("Email atau password salah.. :(");
     } finally {
       setLoading(false);
     }
