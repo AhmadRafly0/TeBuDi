@@ -83,7 +83,9 @@ export default function ReadBookPage() {
                         const savedPage = progressRes.data.data.currentPage;
                         setInitialPage(savedPage - 1);
                         currentPageRef.current = savedPage - 1; 
-                        toast.success(`Melanjutkan dari halaman ${savedPage}`);
+                        toast.success(`Melanjutkan dari halaman ${savedPage}`, {
+                            id: 'toast-progress-baca'
+                        });
                     }
                 } catch (err) {
                     console.log("Belum ada progres baca untuk buku ini.");
