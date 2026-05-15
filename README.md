@@ -9,8 +9,8 @@ Proyek ini dikerjakan secara kolaboratif oleh Kelompok Array Of Us:
 1. **Bimo Abdul Aziz** - [Lead Developer / Fullstack]
 2. **Ahmad Rafly** - [Fullstack]
 3. **M. Alfarizi Aziz** - [Fullstack]
-4. **Muhammad Khalifa Buana** - [Backend Engineer]
-5. **Andrean Daud Marojahan Siregar** - [Frontend Engineer]
+4. **Muhammad Khalifa Buana** - [Frontend Engineer]
+5. **Andrean Daud Marojahan Siregar** - [Backend Engineer]
 6. **M. Ian Wijaya** - [Frontend Engineer]
 
 ---
