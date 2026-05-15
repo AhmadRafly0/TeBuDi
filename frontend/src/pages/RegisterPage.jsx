@@ -76,13 +76,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center">
-      <RegisterForm
-        form={form}
-        loading={loading}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-      />
-    </div>
+    <RegisterForm
+      form={form}
+      loading={loading}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+    />
   );
 }

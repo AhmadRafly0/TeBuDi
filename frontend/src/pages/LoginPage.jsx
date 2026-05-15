@@ -71,13 +71,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F8F6] flex items-center justify-center">
-      <LoginForm
-        form={form}
-        loading={loading}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-      />
-    </div>
+    <LoginForm
+      form={form}
+      loading={loading}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+    />
   );
 }
