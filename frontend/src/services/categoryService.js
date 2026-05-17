@@ -3,14 +3,14 @@
  * @description Service layer untuk semua API call yang berhubungan dengan kategori.
  */
 
-import axios from "axios";
+import apiClient from "./apiClient";
 
 /**
  * Ambil semua kategori dari server.
  * @returns {Promise<Array>} Array of category objects { idCategory, nameCategory }
  */
 export async function fetchAllCategories() {
-  const res = await axios.get("/api/categories");
+  const res = await apiClient.get("/api/categories");
   return res.data?.data ?? res.data ?? [];
 }
 
@@ -20,7 +20,7 @@ export async function fetchAllCategories() {
  * @returns {Promise<Array>} Array of book objects
  */
 export async function fetchBooksByCategory(categoryName) {
-  const res = await axios.get("/api/books/search", {
+  const res = await apiClient.get("/api/books/search", {
     params: { category: categoryName },
   });
   return res.data?.data ?? res.data ?? [];

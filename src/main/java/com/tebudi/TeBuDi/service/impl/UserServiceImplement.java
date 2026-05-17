@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.tebudi.TeBuDi.dto.UserLoginDTO;
@@ -106,6 +107,7 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(String id){
         userRepository.deleteById(id);
     }

@@ -3,14 +3,14 @@
  * @description Service layer untuk API call yang berhubungan dengan langganan (subscription).
  */
 
-import axios from "axios";
+import apiClient from "./apiClient";
 
 /**
  * Ambil semua paket langganan yang tersedia.
  * @returns {Promise<Array>} Array of plan objects
  */
 export async function fetchPlans() {
-  const res = await axios.get("/api/plans");
+  const res = await apiClient.get("/api/plans");
   return res.data?.data ?? [];
 }
 
@@ -20,7 +20,7 @@ export async function fetchPlans() {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function createPlan(planData) {
-  const res = await axios.post("/api/plans", planData);
+  const res = await apiClient.post("/api/plans", planData);
   return res.data;
 }
 
@@ -31,7 +31,7 @@ export async function createPlan(planData) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function updatePlan(planId, planData) {
-  const res = await axios.put(`/api/plans/${planId}`, planData);
+  const res = await apiClient.put(`/api/plans/${planId}`, planData);
   return res.data;
 }
 
@@ -41,7 +41,7 @@ export async function updatePlan(planId, planData) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function deletePlan(planId) {
-  const res = await axios.delete(`/api/plans/${planId}`);
+  const res = await apiClient.delete(`/api/plans/${planId}`);
   return res.data;
 }
 
@@ -51,7 +51,7 @@ export async function deletePlan(planId) {
  * @returns {Promise<Object>} Data transaksi (transactionId, amount, dll)
  */
 export async function checkoutPlan(planId) {
-  const res = await axios.post("/api/subscriptions/checkout", { planId });
+  const res = await apiClient.post("/api/subscriptions/checkout", { planId });
   if (!res.data.success) throw new Error(res.data.message || "Checkout gagal.");
   return res.data.data;
 }
@@ -62,7 +62,7 @@ export async function checkoutPlan(planId) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function confirmPayment(transactionId) {
-  const res = await axios.post("/api/subscriptions/payment-callback", { transactionId });
+  const res = await apiClient.post("/api/subscriptions/payment-callback", { transactionId });
   if (!res.data.success) throw new Error(res.data.message || "Pembayaran gagal.");
   return res.data;
 }
@@ -73,7 +73,7 @@ export async function confirmPayment(transactionId) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function cancelPayment(transactionId) {
-  const res = await axios.post("/api/subscriptions/cancel", { transactionId });
+  const res = await apiClient.post("/api/subscriptions/cancel", { transactionId });
   return res.data;
 }
 
@@ -82,7 +82,7 @@ export async function cancelPayment(transactionId) {
  * @returns {Promise<boolean>} true jika langganan aktif
  */
 export async function fetchSubscriptionStatus() {
-  const res = await axios.get("/api/userSubs/status", { withCredentials: true });
+  const res = await apiClient.get("/api/userSubs/status", { withCredentials: true });
   if (res.data.success) return res.data.data?.active ?? false;
   return false;
 }

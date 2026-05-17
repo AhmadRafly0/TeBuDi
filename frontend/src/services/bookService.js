@@ -6,14 +6,14 @@
  * dan API call mudah di-reuse atau di-mock saat testing.
  */
 
-import axios from "axios";
+import apiClient from "./apiClient";
 
 /**
  * Ambil semua buku dari server.
  * @returns {Promise<Array>} Array of book objects
  */
 export async function fetchAllBooks() {
-  const res = await axios.get("/api/books");
+  const res = await apiClient.get("/api/books");
   return res.data?.data ?? res.data ?? [];
 }
 
@@ -28,9 +28,9 @@ export async function searchBooks(query) {
   if (!query.trim()) return [];
 
   const [byTitle, byAuthor, byCategory] = await Promise.allSettled([
-    axios.get("/api/books/search", { params: { title: query } }),
-    axios.get("/api/books/search", { params: { author: query } }),
-    axios.get("/api/books/search", { params: { category: query } }),
+    apiClient.get("/api/books/search", { params: { title: query } }),
+    apiClient.get("/api/books/search", { params: { author: query } }),
+    apiClient.get("/api/books/search", { params: { category: query } }),
   ]);
 
   const all = [];
@@ -55,7 +55,7 @@ export async function searchBooks(query) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function createBook(formData) {
-  const res = await axios.post("/api/books", formData, {
+  const res = await apiClient.post("/api/books", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -68,7 +68,7 @@ export async function createBook(formData) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function updateBook(bookId, formData) {
-  const res = await axios.put(`/api/books/${bookId}`, formData, {
+  const res = await apiClient.put(`/api/books/${bookId}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
@@ -80,6 +80,6 @@ export async function updateBook(bookId, formData) {
  * @returns {Promise<Object>} Response data dari server
  */
 export async function deleteBook(bookId) {
-  const res = await axios.delete(`/api/books/${bookId}`);
+  const res = await apiClient.delete(`/api/books/${bookId}`);
   return res.data;
 }
