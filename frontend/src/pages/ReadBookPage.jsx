@@ -1,13 +1,6 @@
 /**
  * @file pages/ReadBookPage.jsx
  * @description Halaman pembaca buku PDF dengan fitur auto-save progress.
- *
- * Fitur:
- * - Render PDF menggunakan @react-pdf-viewer/core
- * - Auto-save progress baca (halaman terakhir) ke API
- * - Lanjutkan dari halaman terakhir saat membuka kembali
- * - Toggle dark mode untuk kenyamanan membaca
- * - Toolbar custom (tanpa tombol print/download)
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -22,13 +15,9 @@ import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-/** Base URL API, fallback ke localhost saat development */
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+/** Base URL API — kosong di dev agar lewat Vite proxy, diisi di production */
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-/**
- * Halaman pembaca buku PDF.
- * Fetch file PDF sebagai blob untuk mencegah URL langsung terekspos.
- */
 export default function ReadBookPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,10 +33,7 @@ export default function ReadBookPage() {
   /** Ref untuk menyimpan total halaman dokumen */
   const totalPagesRef = useRef(0);
 
-  /**
-   * Toolbar custom: sembunyikan tombol print dan download.
-   * Hanya tampilkan: search, zoom, navigasi halaman, fullscreen.
-   */
+  /** Toolbar custom: sembunyikan tombol print dan download. */
   const renderToolbar = (Toolbar) => (
     <Toolbar>
       {(slots) => {
@@ -104,48 +90,70 @@ export default function ReadBookPage() {
     totalPagesRef.current = e.doc.numPages;
   };
 
-  /**
-   * Fetch progress baca dan file PDF saat komponen mount.
-   * Progress diambil dulu, lalu file PDF di-fetch sebagai blob.
-   */
+  /** Fetch progress baca dan file PDF saat komponen mount. */
   useEffect(() => {
-    let objectUrl = null;
+    let activeObjectUrl = null;
 
     const fetchBookAndProgress = async () => {
       try {
-        // Coba ambil progress baca sebelumnya
+        setLoading(true);
+        setIsDataReady(false);
+
+        // 1. Ambil progress baca sebelumnya
+        let savedPageOffset = 0;
         try {
           const progressRes = await axios.get(`${BASE_URL}/api/progress/${id}`, {
             withCredentials: true,
           });
           if (progressRes.data.success && progressRes.data.data) {
             const savedPage = progressRes.data.data.currentPage;
-            setInitialPage(savedPage - 1); // PDF viewer pakai 0-indexed
-            currentPageRef.current = savedPage - 1;
+            savedPageOffset = savedPage - 1; // PDF viewer pakai 0-indexed
+            setInitialPage(savedPageOffset);
+            currentPageRef.current = savedPageOffset;
+            
             toast.success(`Melanjutkan dari halaman ${savedPage}`, {
               id: "toast-progress-baca",
             });
           }
-        } catch {
-          // Belum ada progress — mulai dari halaman 1
+        } catch (err) {
+          console.log("Belum ada progress lama, mulai dari halaman 1.");
         }
 
-        // Fetch file PDF sebagai blob (mencegah URL langsung terekspos)
-        const response = await axios.get(`${BASE_URL}/api/books/${id}/read`, {
-          responseType: "blob",
-          withCredentials: true,
-        });
+        // 2. Fetch file PDF sebagai blob dari backend (backend proxy ke Cloudinary)
+        // URL Cloudinary tidak pernah ter-expose ke frontend
+        try {
+          const pdfAxios = axios.create();
+          delete pdfAxios.defaults.headers.common['Accept'];
 
-        objectUrl = window.URL.createObjectURL(
-          new Blob([response.data], { type: "application/pdf" })
-        );
-        setFileUrl(objectUrl);
-        setIsDataReady(true);
+          const response = await pdfAxios.get(`${BASE_URL}/api/books/${id}/read`, {
+            responseType: "blob",
+            withCredentials: true,
+            headers: { 'Accept': 'application/pdf, */*' },
+          });
+
+          // Cek jika backend kirim JSON error terbungkus blob
+          if (response.data.type === "application/json") {
+            const text = await response.data.text();
+            const err = JSON.parse(text);
+            throw new Error(err.message || "Gagal memuat berkas");
+          }
+
+          const pdfBlob = new Blob([response.data], { type: "application/pdf" });
+          activeObjectUrl = window.URL.createObjectURL(pdfBlob);
+          setFileUrl(activeObjectUrl);
+          setIsDataReady(true);
+        } catch (err) {
+          console.error("Error loading PDF:", err);
+          const msg = err.response?.data?.message || err.message || "Gagal memuat dokumen buku dari cloud";
+          toast.error(msg);
+        }
+
       } catch (error) {
+        console.error("Error loading book:", error);
         if (error.response?.status === 401) {
           toast.error("Akses ditolak! Pastikan kamu sudah login/Premium.");
         } else {
-          toast.error("Gagal memuat buku.");
+          toast.error("Gagal memuat dokumen buku dari cloud.");
         }
         navigate("/home");
       } finally {
@@ -155,21 +163,18 @@ export default function ReadBookPage() {
 
     fetchBookAndProgress();
 
-    // Cleanup: revoke object URL saat komponen unmount
+    // Cleanup: hapus URL blob dari memori saat user keluar halaman
     return () => {
-      if (objectUrl) {
-        window.URL.revokeObjectURL(objectUrl);
+      if (activeObjectUrl) {
+        window.URL.revokeObjectURL(activeObjectUrl);
       }
     };
   }, [id, navigate]);
 
-  /**
-   * Simpan progress baca ke API.
-   * Hanya dipanggil jika data sudah siap (isDataReady = true).
-   */
+  /** Simpan progress baca ke API */
   const saveProgressToDatabase = async () => {
     if (!isDataReady) return;
-    const actualPageToSave = currentPageRef.current + 1; // Konversi ke 1-indexed
+    const actualPageToSave = currentPageRef.current + 1; // Kembalikan ke 1-indexed
     try {
       await axios.put(
         `${BASE_URL}/api/progress/${id}`,
@@ -180,7 +185,7 @@ export default function ReadBookPage() {
         { withCredentials: true }
       );
     } catch (error) {
-      console.error("Gagal auto-save progres", error);
+      console.error("Gagal melakukan auto-save progres:", error);
     }
   };
 
@@ -189,18 +194,13 @@ export default function ReadBookPage() {
     currentPageRef.current = e.currentPage;
   };
 
-  /**
-   * Tutup reader: simpan progress dulu, lalu navigasi ke home.
-   */
+  /** Tutup reader dengan menyimpan progress terlebih dahulu */
   const handleClose = async () => {
     await saveProgressToDatabase();
     navigate("/home");
   };
 
-  /**
-   * Auto-save saat user menutup tab/browser (beforeunload).
-   * Juga save saat komponen unmount (cleanup).
-   */
+  /** Auto-save saat user menutup tab/browser (beforeunload) */
   useEffect(() => {
     const handleBeforeUnload = () => {
       saveProgressToDatabase();
@@ -209,12 +209,12 @@ export default function ReadBookPage() {
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      saveProgressToDatabase(); // Save saat unmount (navigasi dalam app)
+      saveProgressToDatabase(); 
     };
   }, [id, isDataReady]);
 
-  // Loading state
-  if (loading || !isDataReady) {
+  // Loading state (Pastikan merender loading jika fileUrl belum siap sepenuhnya)
+  if (loading || !isDataReady || !fileUrl) {
     return (
       <div
         className={`flex h-screen items-center justify-center ${
@@ -306,18 +306,16 @@ export default function ReadBookPage() {
               : "bg-white border-stone-300"
           }`}
         >
-          {fileUrl && isDataReady && (
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-              <Viewer
-                fileUrl={fileUrl}
-                plugins={[defaultLayoutPluginInstance]}
-                initialPage={initialPage}
-                onPageChange={handlePageChange}
-                onDocumentLoad={handleDocumentLoad}
-                theme={isDarkMode ? "dark" : "light"}
-              />
-            </Worker>
-          )}
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <Viewer
+              fileUrl={fileUrl}
+              plugins={[defaultLayoutPluginInstance]}
+              initialPage={initialPage}
+              onPageChange={handlePageChange}
+              onDocumentLoad={handleDocumentLoad}
+              theme={isDarkMode ? "dark" : "light"}
+            />
+          </Worker>
         </div>
       </div>
     </div>

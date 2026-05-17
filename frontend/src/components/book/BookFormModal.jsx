@@ -43,8 +43,23 @@ export default function BookFormModal({ initial = null, onClose, onSuccess, cate
   const isEdit = !!initial;
 
   // Inisialisasi form: mode edit pakai data buku, mode tambah pakai form kosong
+  // Normalisasi field category: API return categoryId (integer), entity lama return category (object)
+  const normalizeCategoryId = (data) => {
+    if (!data) return "";
+    // BookResponseDTO pakai categoryId
+    if (data.categoryId != null) return data.categoryId;
+    // Entity Book pakai category sebagai object
+    if (data.category != null) {
+      if (typeof data.category === "object") return data.category.idCategory ?? data.category.id ?? "";
+      return data.category;
+    }
+    return "";
+  };
+
   const [form, setForm] = useState(
-    initial ? { ...initial, bookFile: null } : { ...EMPTY_FORM }
+    initial
+      ? { ...initial, category: normalizeCategoryId(initial), bookFile: null }
+      : { ...EMPTY_FORM }
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

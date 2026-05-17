@@ -5,18 +5,23 @@ import java.util.List;
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
-import com.tebudi.TeBuDi.model.Book;
 import org.springframework.core.io.Resource;
 
 public interface BookService {
-    List<Book> getAllBooks();
+    List<BookResponseDTO> getAllBooks();
 
-    List<Book> searchByTitle(String title);
-    List<Book> searchByCategory(String categoryName);
-    List<Book> searchByAuthor(String author);
+    List<BookResponseDTO> searchByTitle(String title);
+    List<BookResponseDTO> searchByCategory(String categoryName);
+    List<BookResponseDTO> searchByAuthor(String author);
 
     BookResponseDTO getBookById(String id);
     
+    /**
+     * Validasi akses user ke buku (cek premium/subscription) dan return URL file.
+     * Untuk Cloudinary URL, koreksi resource_type jika perlu.
+     */
+    String getBookFileUrl(String bookId, String userId);
+
     BookResponseDTO saveBook(BookRegisterDTO book);
     BookResponseDTO updateBook(String id, BookUpdateDTO book);
     void deleteBook(String id);

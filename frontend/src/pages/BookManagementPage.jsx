@@ -89,7 +89,7 @@ export default function BookManagementPage() {
   const filtered = books.filter((b) => {
     if (tabFilter === "premium" && !b.isPremium) return false;
     if (tabFilter === "free" && b.isPremium) return false;
-    if (catFilter && String(b.category) !== catFilter) return false;
+    if (catFilter && String(b.categoryId ?? b.category) !== catFilter) return false;
     const q = search.toLowerCase();
     if (
       q &&

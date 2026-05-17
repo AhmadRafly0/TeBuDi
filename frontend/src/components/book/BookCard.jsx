@@ -25,9 +25,11 @@ import { Pencil, Trash2 } from "lucide-react";
  * @param {function} props.onDelete - Callback saat tombol hapus diklik, menerima id buku
  */
 export default function BookCard({ book, categories, onEdit, onDelete }) {
-  // Cari nama kategori berdasarkan ID secara dinamis
+  // Gunakan categoryName dari DTO langsung, fallback ke lookup dari categories array
   const catLabel =
-    categories.find((c) => c.idCategory === book.category)?.nameCategory ?? "-";
+    book.categoryName ||
+    categories.find((c) => c.idCategory === (book.categoryId ?? book.category))?.nameCategory ||
+    "-";
 
   return (
     <div className="group relative flex flex-col bg-[#F9F8F6] border border-[#D9CFC7] rounded-lg overflow-hidden hover:border-[#C9B59C] hover:shadow-md transition-all duration-200">
