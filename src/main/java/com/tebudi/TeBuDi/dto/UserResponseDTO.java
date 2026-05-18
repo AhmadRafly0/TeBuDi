@@ -12,4 +12,5 @@ public class UserResponseDTO {
     private String role;
     private String avatarURL;
     private LocalDateTime createdAt;
+    private String token; // JWT token — hanya diisi saat login
 }

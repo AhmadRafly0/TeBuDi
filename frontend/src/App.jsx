@@ -1,4 +1,15 @@
-// frontend/src/App.jsx
+/**
+ * @file App.jsx
+ * @description Root komponen aplikasi TeBuDi.
+ *
+ * Mendefinisikan semua route aplikasi dengan tiga level akses:
+ * - Public only: /login, /register (redirect ke /home jika sudah login)
+ * - Protected: semua halaman user (butuh login)
+ * - Admin only: /admin/* (butuh login + role admin)
+ *
+ * Juga mengkonfigurasi global toast notification.
+ */
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -22,9 +33,13 @@ import {
   PublicOnlyRoute,
 } from "./routes/ProtectedRoute";
 
+/**
+ * Root komponen dengan definisi routing lengkap.
+ */
 export default function App() {
   return (
     <>
+      {/* Global toast notification */}
       <Toaster
         position="bottom-right"
         reverseOrder={false}
@@ -37,7 +52,7 @@ export default function App() {
             minWidth: "275px",
           },
           success: { style: { border: "2px solid #22c55e" } },
-          error:   { style: { border: "2px solid #ef4444" } },
+          error: { style: { border: "2px solid #ef4444" } },
           loading: { style: { border: "2px solid #3b82f6" } },
         }}
       />
@@ -48,19 +63,19 @@ export default function App() {
 
         {/* ── Public only (sudah login → redirect ke /home) ── */}
         <Route element={<PublicOnlyRoute />}>
-          <Route path="/login"    element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>
 
         {/* ── Protected (harus login) ── */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/home"         element={<HomePage />} />
-          <Route path="/favourite"    element={<FavouritePage />} />
-          <Route path="/category"     element={<CategoryPage />} />
-          <Route path="/profile"      element={<ProfilePage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/favourite" element={<FavouritePage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/subscription" element={<SubscriptionPage />} />
-          <Route path="/payment"      element={<PaymentPage />} />
-          <Route path="/read/:id"     element={<ReadBookPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/read/:id" element={<ReadBookPage />} />
         </Route>
 
         {/* ── Admin only (harus login + role === "admin") ── */}
@@ -69,7 +84,7 @@ export default function App() {
           <Route path="/admin/plans" element={<SubscriptionAdminPage />} />
         </Route>
 
-        {/* 404 */}
+        {/* 404 — halaman tidak ditemukan */}
         <Route
           path="*"
           element={

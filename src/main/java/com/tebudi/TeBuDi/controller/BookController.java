@@ -4,12 +4,10 @@ package com.tebudi.TeBuDi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,12 +22,8 @@ import com.tebudi.TeBuDi.dto.ApiResponseDTO;
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
-import com.tebudi.TeBuDi.dto.UserResponseDTO;
-import com.tebudi.TeBuDi.exception.UnauthorizedException;
-import com.tebudi.TeBuDi.model.Book;
 import com.tebudi.TeBuDi.service.BookService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -42,18 +36,18 @@ public class BookController {
     // ── Public (semua user login) ─────────────────────────────────────────────
 
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<List<Book>>> getAllBooks() {
-        List<Book> books = bookService.getAllBooks();
+    public ResponseEntity<ApiResponseDTO<List<BookResponseDTO>>> getAllBooks() {
+        List<BookResponseDTO> books = bookService.getAllBooks();
         return ResponseEntity.ok(new ApiResponseDTO<>(true, "Daftar buku berhasil diambil", books));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponseDTO<List<Book>>> searchBooks(
+    public ResponseEntity<ApiResponseDTO<List<BookResponseDTO>>> searchBooks(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String author) {
 
-        List<Book> books;
+        List<BookResponseDTO> books;
         if (title != null && !title.isBlank()) {
             books = bookService.searchByTitle(title);
         } else if (category != null && !category.isBlank()) {
@@ -74,19 +68,46 @@ public class BookController {
     }
 
     @GetMapping("/{id}/read")
-    public ResponseEntity<Resource> readBookFile(@PathVariable String id, HttpSession session) {
-        UserResponseDTO sessionUser = (UserResponseDTO) session.getAttribute("USER_SESSION");
+    public ResponseEntity<?> readBookFile(@PathVariable String id, Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
 
-        if (sessionUser == null) {
-            throw new UnauthorizedException("Silakan login terlebih dahulu untuk membaca buku.");
+        try {
+            String fileUrl = bookService.getBookFileUrl(id, userId);
+
+            // Proxy PDF dari Cloudinary lewat backend agar URL tidak ter-expose ke frontend
+            java.net.URL url = new java.net.URL(fileUrl);
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("User-Agent", "TeBuDi-Server/1.0");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(30000);
+            conn.connect();
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode != 200) {
+                return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                        .body(ApiResponseDTO.error("Gagal mengambil file dari cloud (HTTP " + responseCode + ")"));
+            }
+
+            byte[] pdfBytes;
+            try (java.io.InputStream is = conn.getInputStream()) {
+                pdfBytes = is.readAllBytes();
+            }
+            conn.disconnect();
+
+            return ResponseEntity.ok()
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
+                            "inline; filename=\"book_" + id + ".pdf\"")
+                    .body(pdfBytes);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponseDTO.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseDTO.error("Gagal melakukan streaming dokumen: " + e.getMessage()));
         }
-
-        Resource resource = bookService.getBookFileAsResource(id, sessionUser.getId());
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
     }
 
     // ── Admin only ────────────────────────────────────────────────────────────
