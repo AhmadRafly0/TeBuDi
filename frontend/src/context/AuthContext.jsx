@@ -12,7 +12,7 @@
  */
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 
 /** Context object — jangan dipakai langsung, gunakan hook useAuth() */
 const AuthContext = createContext(null);
@@ -41,14 +41,14 @@ export function AuthProvider({ children }) {
    */
   const fetchUser = useCallback(async () => {
     try {
-      const res = await axios.get("/api/auth/me", { withCredentials: true });
+      const res = await apiClient.get("/api/auth/me");
       if (res.data.success) {
         setUser(res.data.data);
       } else {
         setUser(null);
       }
     } catch {
-      // 401 → belum login, bukan error fatal
+      // 401 → belum login atau token expired
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -66,8 +66,9 @@ export function AuthProvider({ children }) {
    */
   const logout = useCallback(async () => {
     try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      await apiClient.post("/api/auth/logout", {});
     } finally {
+      localStorage.removeItem("token");
       setUser(null);
     }
   }, []);

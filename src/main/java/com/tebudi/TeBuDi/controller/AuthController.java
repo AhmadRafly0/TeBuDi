@@ -2,7 +2,7 @@ package com.tebudi.TeBuDi.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,59 +13,56 @@ import com.tebudi.TeBuDi.dto.ApiResponseDTO;
 import com.tebudi.TeBuDi.dto.UserLoginDTO;
 import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
+import com.tebudi.TeBuDi.security.JwtUtil;
 import com.tebudi.TeBuDi.service.UserService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
-
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final UserService userService;
-
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> register(@Valid @RequestBody UserRegisterDTO request) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> register(
+            @Valid @RequestBody UserRegisterDTO request) {
         UserResponseDTO data = userService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success("Register berhasil!", data));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.success("Register berhasil!", data));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> login(@Valid @RequestBody UserLoginDTO request, HttpSession session) {
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> login(
+            @Valid @RequestBody UserLoginDTO request) {
         UserResponseDTO data = userService.login(request);
-        session.setAttribute("USER_SESSION", data);
+
+        // Generate JWT dan sisipkan ke response
+        String token = jwtUtil.generateToken(data.getId(), data.getRole());
+        data.setToken(token);
+
         return ResponseEntity.ok(ApiResponseDTO.success("Login berhasil!", data));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getCurrentUser(HttpSession session) {
-        UserResponseDTO sessionUser = (UserResponseDTO) session.getAttribute("USER_SESSION");
-
-        if (sessionUser == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new ApiResponseDTO<>(false, "Session tidak ditemukan, silakan login kembali", null));
+    public ResponseEntity<ApiResponseDTO<UserResponseDTO>> getCurrentUser(
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponseDTO<>(false, "Token tidak valid atau sudah expired", null));
         }
 
-        String userId = sessionUser.getId();
-
-        UserResponseDTO data =userService.getProfile(userId);
+        String userId = (String) authentication.getPrincipal();
+        UserResponseDTO data = userService.getProfile(userId);
         return ResponseEntity.ok(ApiResponseDTO.success("Profil ditemukan!", data));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponseDTO<Void>> logout(HttpServletRequest request) {
-        userService.logout(request);
+    public ResponseEntity<ApiResponseDTO<Void>> logout() {
+        // JWT stateless — logout cukup hapus token di sisi frontend
         return ResponseEntity.ok(ApiResponseDTO.success("Logout berhasil!", null));
     }
-    
-    
-    
-    
 }

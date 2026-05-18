@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 import { Plus, RefreshCw, Search } from "lucide-react";
 
 // Komponen modular
@@ -49,8 +49,8 @@ export default function BookManagementPage() {
       setLoading(true);
       setFetchError(null);
       const [booksRes, categoriesRes] = await Promise.all([
-        axios.get("/api/books"),
-        axios.get("/api/categories"),
+        apiClient.get("/api/books"),
+        apiClient.get("/api/categories"),
       ]);
       setBooks(booksRes.data?.data ?? booksRes.data ?? []);
       setCategories(categoriesRes.data?.data ?? categoriesRes.data ?? []);
@@ -73,7 +73,7 @@ export default function BookManagementPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await axios.delete(`/api/books/${deleteTarget.id}`);
+      await apiClient.delete(`/api/books/${deleteTarget.id}`);
       await fetchData();
       setDeleteTarget(null);
     } catch {

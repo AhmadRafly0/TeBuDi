@@ -6,6 +6,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import apiClient from "../services/apiClient";
 import toast from "react-hot-toast";
 import { ArrowLeft, Bookmark, Moon, Sun } from "lucide-react";
 
@@ -102,9 +103,7 @@ export default function ReadBookPage() {
         // 1. Ambil progress baca sebelumnya
         let savedPageOffset = 0;
         try {
-          const progressRes = await axios.get(`${BASE_URL}/api/progress/${id}`, {
-            withCredentials: true,
-          });
+          const progressRes = await apiClient.get(`/api/progress/${id}`);
           if (progressRes.data.success && progressRes.data.data) {
             const savedPage = progressRes.data.data.currentPage;
             savedPageOffset = savedPage - 1; // PDF viewer pakai 0-indexed
@@ -122,13 +121,16 @@ export default function ReadBookPage() {
         // 2. Fetch file PDF sebagai blob dari backend (backend proxy ke Cloudinary)
         // URL Cloudinary tidak pernah ter-expose ke frontend
         try {
+          const token = localStorage.getItem("token");
           const pdfAxios = axios.create();
           delete pdfAxios.defaults.headers.common['Accept'];
 
           const response = await pdfAxios.get(`${BASE_URL}/api/books/${id}/read`, {
             responseType: "blob",
-            withCredentials: true,
-            headers: { 'Accept': 'application/pdf, */*' },
+            headers: {
+              'Accept': 'application/pdf, */*',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
           });
 
           // Cek jika backend kirim JSON error terbungkus blob
@@ -176,13 +178,12 @@ export default function ReadBookPage() {
     if (!isDataReady) return;
     const actualPageToSave = currentPageRef.current + 1; // Kembalikan ke 1-indexed
     try {
-      await axios.put(
-        `${BASE_URL}/api/progress/${id}`,
+      await apiClient.put(
+        `/api/progress/${id}`,
         {
           currentPage: actualPageToSave,
           totalPages: totalPagesRef.current,
-        },
-        { withCredentials: true }
+        }
       );
     } catch (error) {
       console.error("Gagal melakukan auto-save progres:", error);

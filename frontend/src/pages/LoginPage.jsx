@@ -9,7 +9,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 
 // Komponen dan context modular
 import LoginForm from "../components/auth/LoginForm";
@@ -21,7 +21,7 @@ import { useAuth } from "../context/AuthContext";
  */
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { refetchUser } = useAuth();
+  const { setUser } = useAuth();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -58,9 +58,12 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      await axios.post("/api/auth/login", form, { withCredentials: true });
-      // Update AuthContext supaya ProtectedRoute tahu user sudah login
-      await refetchUser();
+      const res = await apiClient.post("/api/auth/login", form);
+      const { token, ...userData } = res.data.data;
+      // Simpan JWT token ke localStorage
+      localStorage.setItem("token", token);
+      // Set user langsung ke AuthContext — tidak perlu refetch /api/auth/me
+      setUser(userData);
       toast.success("Selamat datang di TeBuDi!! :D");
       navigate("/home");
     } catch {

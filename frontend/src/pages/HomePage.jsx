@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 import { BookOpen, Star } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -30,7 +30,7 @@ export default function HomePage() {
       try {
         setLoading(true);
         const [booksRes] = await Promise.all([
-          axios.get("/api/books"),
+          apiClient.get("/api/books"),
         ]);
         if (booksRes.data.success) {
           setBooks(booksRes.data.data);

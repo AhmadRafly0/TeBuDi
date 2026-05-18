@@ -11,15 +11,12 @@ import com.tebudi.TeBuDi.dto.UserLoginDTO;
 import com.tebudi.TeBuDi.dto.UserRegisterDTO;
 import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.dto.UserUpdateDTO;
-import com.tebudi.TeBuDi.exception.UnauthorizedException;
 import com.tebudi.TeBuDi.model.User;
 import com.tebudi.TeBuDi.model.UserSubscription;
 import com.tebudi.TeBuDi.repository.UserRepository;
 import com.tebudi.TeBuDi.repository.UserSubscriptionRepository;
 import com.tebudi.TeBuDi.service.UserService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -71,17 +68,6 @@ public class UserServiceImplement implements UserService {
         }
 
         return toResponse(user);
-    }
-
-    @Override
-    public void logout(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
-
-        if(session == null){
-            throw new UnauthorizedException("Anda belum login!");
-        }
-
-        session.invalidate();
     }
 
     @Override

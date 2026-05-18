@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,10 +22,8 @@ import com.tebudi.TeBuDi.dto.ApiResponseDTO;
 import com.tebudi.TeBuDi.dto.BookRegisterDTO;
 import com.tebudi.TeBuDi.dto.BookResponseDTO;
 import com.tebudi.TeBuDi.dto.BookUpdateDTO;
-import com.tebudi.TeBuDi.dto.UserResponseDTO;
 import com.tebudi.TeBuDi.service.BookService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -69,15 +68,11 @@ public class BookController {
     }
 
     @GetMapping("/{id}/read")
-    public ResponseEntity<?> readBookFile(@PathVariable String id, HttpSession session) {
-        UserResponseDTO sessionUser = (UserResponseDTO) session.getAttribute("USER_SESSION");
-        if (sessionUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponseDTO.error("Silakan login terlebih dahulu."));
-        }
+    public ResponseEntity<?> readBookFile(@PathVariable String id, Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
 
         try {
-            String fileUrl = bookService.getBookFileUrl(id, sessionUser.getId());
+            String fileUrl = bookService.getBookFileUrl(id, userId);
 
             // Proxy PDF dari Cloudinary lewat backend agar URL tidak ter-expose ke frontend
             java.net.URL url = new java.net.URL(fileUrl);

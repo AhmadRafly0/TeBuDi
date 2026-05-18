@@ -14,7 +14,7 @@
  */
 
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 import { useAuth } from "./AuthContext";
 
 /** Context object — gunakan hook useSearch() */
@@ -45,9 +45,7 @@ export function SearchProvider({ children }) {
   useEffect(() => {
     const fetchSubsStatus = async () => {
       try {
-        const res = await axios.get("/api/userSubs/status", {
-          withCredentials: true,
-        });
+        const res = await apiClient.get("/api/userSubs/status");
         if (res.data.success) {
           setIsSubscribed(res.data.data?.active ?? false);
         }

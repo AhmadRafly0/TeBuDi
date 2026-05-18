@@ -9,7 +9,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 
 // Komponen modular
 import RegisterForm from "../components/auth/RegisterForm";
@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      await axios.post("/api/auth/register", form);
+      await apiClient.post("/api/auth/register", form);
       toast.success("Registrasi berhasil!! :D");
       navigate("/login");
     } catch (error) {

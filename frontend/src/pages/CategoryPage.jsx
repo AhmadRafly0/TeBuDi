@@ -12,7 +12,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { BookOpen, Star, ArrowLeft, Grid3X3, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import BookModal from "../components/BookModal";
@@ -63,7 +63,7 @@ export default function CategoryPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await axios.get("/api/books");
+        const res = await apiClient.get("/api/books");
         const data = res.data?.data ?? res.data ?? [];
         setAllBooks(data);
         setBooks(data);

@@ -4,16 +4,18 @@
  *
  * - Development: VITE_API_BASE_URL kosong → pakai Vite proxy (/api → localhost:8080)
  * - Production:  VITE_API_BASE_URL diisi URL backend → request langsung ke backend
+ *
+ * Auth berbasis JWT: token disimpan di localStorage, dikirim via Authorization header.
  */
 
 import axios from "axios";
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "",
-  withCredentials: true, // Kirim session cookie ke backend (auth berbasis HttpSession)
+  // withCredentials tidak diperlukan karena auth pakai JWT header, bukan session cookie
 });
 
-// Tambahkan Authorization header jika ada token di localStorage (opsional/legacy)
+// Sisipkan JWT token ke setiap request jika tersedia
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {

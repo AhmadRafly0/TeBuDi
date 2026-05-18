@@ -82,7 +82,7 @@ export async function cancelPayment(transactionId) {
  * @returns {Promise<boolean>} true jika langganan aktif
  */
 export async function fetchSubscriptionStatus() {
-  const res = await apiClient.get("/api/userSubs/status", { withCredentials: true });
+  const res = await apiClient.get("/api/userSubs/status");
   if (res.data.success) return res.data.data?.active ?? false;
   return false;
 }

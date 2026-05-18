@@ -10,7 +10,7 @@
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Star, X } from "lucide-react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 
 const PLACEHOLDER_COVER =
   "https://bookstoreromanceday.org/wp-content/uploads/2020/08/book-cover-placeholder.png";
@@ -40,7 +40,7 @@ export default function BookModal({ book, onClose, isSubscribed }) {
     }
 
     try {
-      const response = await axios.get("/api/userSubs/status");
+      const response = await apiClient.get("/api/userSubs/status");
       if (response.data.success) {
         if (response.data.data.active) {
           navigate(`/read/${book.id}`);

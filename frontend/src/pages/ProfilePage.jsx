@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../services/apiClient";
 import toast from "react-hot-toast";
 import { ArrowLeft, Camera, Loader2, User, Mail, Lock, Shield } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -48,7 +48,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("/api/auth/me");
+        const response = await apiClient.get("/api/auth/me");
         if (response.data.success) {
           setUser(response.data.data);
           setForm({
@@ -75,7 +75,7 @@ export default function ProfilePage() {
     formData.append("file", file);
     setUploadLoading(true);
     try {
-      const response = await axios.post(`/api/users/${user.id}/avatar`, formData, {
+      const response = await apiClient.post(`/api/users/${user.id}/avatar`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (response.data.success) {
@@ -111,7 +111,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const response = await axios.put(`/api/users/${user.id}`, payload);
+      const response = await apiClient.put(`/api/users/${user.id}`, payload);
       if (response.data.success) {
         toast.success(response.data.message || "Profil berhasil diperbarui!");
         setUser(response.data.data);
@@ -130,7 +130,7 @@ export default function ProfilePage() {
     isDeleting.current = true;
     setDeleteLoading(true);
     try {
-      const response = await axios.delete(`/api/users/${user.id}`);
+      const response = await apiClient.delete(`/api/users/${user.id}`);
       if (response.data.success) {
         await logout();
         toast.success("Akun berhasil dihapus.");

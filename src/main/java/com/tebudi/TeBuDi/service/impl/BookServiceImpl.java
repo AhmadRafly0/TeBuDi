@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,33 +43,40 @@ public class BookServiceImpl implements BookService {
     private Cloudinary cloudinary; // Inject Cloudinary Bean
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> getAllBooks(){
-        return bookRepository.findAll().stream().map(this::toResponse).toList();
+        return bookRepository.findAllWithCategory().stream().map(this::toResponse).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> searchByTitle(String title) {
-        return bookRepository.findByTitleContainingIgnoreCase(title).stream().map(this::toResponse).toList();
+        return bookRepository.findByTitleContainingIgnoreCaseWithCategory(title).stream().map(this::toResponse).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> searchByCategory(String categoryName) {
-        return bookRepository.findByCategoryNameContainingIgnoreCase(categoryName).stream().map(this::toResponse).toList();
+        return bookRepository.findByCategoryNameContainingIgnoreCaseWithCategory(categoryName).stream().map(this::toResponse).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> searchByAuthor(String author) {
-        return bookRepository.findByAuthorContainingIgnoreCase(author).stream().map(this::toResponse).toList();
+        return bookRepository.findByAuthorContainingIgnoreCaseWithCategory(author).stream().map(this::toResponse).toList();
     }
 
-    @Override 
+    @Override
+    @Transactional(readOnly = true)
     public BookResponseDTO getBookById(String id){
-        Book book = bookRepository.findById(id)
+        Book book = bookRepository.findByIdWithCategory(id)
                     .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan!"));
         return toResponse(book);
     }
 
     @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
     public BookResponseDTO saveBook(BookRegisterDTO request) {
         if (bookRepository.existsById(request.getId())) {
             throw new RuntimeException("ID Book sudah terdaftar");
@@ -111,8 +119,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
     public BookResponseDTO updateBook(String id, BookUpdateDTO request) {
-        Book book = bookRepository.findById(id)
+        Book book = bookRepository.findByIdWithCategory(id)
                     .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan!"));
 
         if (request.getCategory() != null) {
@@ -168,8 +178,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public String getBookFileUrl(String bookId, String userId) {
-        Book book = bookRepository.findById(bookId)
+        Book book = bookRepository.findByIdWithCategory(bookId)
                 .orElseThrow(() -> new RuntimeException("Buku tidak ditemukan."));
 
         if (book.getIsPremium() && !userSubscriptionService.isUserSubscribed(userId)) {
